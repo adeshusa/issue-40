@@ -1,0 +1,371 @@
+"""
+VizFold Archive Utilities
+=========================
+
+This module contains independent utilities for converting VizFold inference
+outputs into a standardized Zarr archive format. These functions are designed
+to support lightweight, offline visualization of model internals such as:
+
+- Layer activations
+- Attention heads
+- Pair representations
+- Protein structure outputs
+
+All methods are intentionally modular so they can be implemented independently
+by different contributors.
+
+Archive layout target (example):
+
+trace.zarr/
+│
+├── layers/
+│   ├── 0/
+│   │   ├── activation
+│   │   └── attention
+│   ├── 1/
+│   │   ├── activation
+│   │   └── attention
+│
+├── representations/
+│   └── pair
+│
+├── structure/
+│   ├── coordinates
+│   └── residue_types
+│
+└── metadata
+"""
+
+import numpy as np
+import zarr
+
+
+# ============================================================
+# METHOD 1
+# ============================================================
+
+def tensor_to_numpy(tensor):
+    """
+    Convert a VizFold tensor into a NumPy array.
+
+    VizFold outputs may come from different frameworks such as:
+    - PyTorch tensors
+    - NumPy arrays
+
+    This function standardizes these formats so they can be stored
+    in a Zarr archive.
+
+    Expected behavior:
+    ------------------
+    If input is a PyTorch tensor:
+        - Detach from computation graph
+        - Move to CPU if needed
+        - Convert to numpy array
+
+    If input is already a NumPy array:
+        - Return it unchanged
+
+    Parameters
+    ----------
+    tensor : torch.Tensor | numpy.ndarray
+
+    Returns
+    -------
+    numpy.ndarray
+        A CPU-based NumPy representation of the tensor.
+    """
+    pass
+
+
+# ============================================================
+# METHOD 2
+# ============================================================
+
+def tensor_to_zarr_array(path, tensor, chunks=None, overwrite=False):
+    """
+    Convert a tensor into a Zarr array stored at the specified path.
+
+    This function creates a Zarr dataset on disk from a tensor or
+    NumPy array.
+
+    Typical usage:
+    - Writing activations
+    - Writing attention maps
+    - Writing pair representations
+
+    Responsibilities:
+    -----------------
+    - Convert tensor to NumPy if necessary
+    - Create a Zarr dataset
+    - Apply chunking if specified
+    - Optionally overwrite existing data
+
+    Parameters
+    ----------
+    path : str
+        Path inside the archive where the array should be stored.
+
+    tensor : numpy.ndarray | torch.Tensor
+        The tensor data to write.
+
+    chunks : tuple, optional
+        Chunk size for Zarr storage.
+
+    overwrite : bool
+        Whether existing data should be replaced.
+
+    Returns
+    -------
+    None
+    """
+    pass
+
+
+# ============================================================
+# METHOD 3
+# ============================================================
+
+def store_layer_activation(path, layer_index, activation_array):
+    """
+    Store a transformer layer activation inside the archive.
+
+    Layer activations represent the hidden state outputs from a
+    transformer block.
+
+    Typical shape:
+        (tokens, hidden_dimension)
+
+    Archive layout:
+        layers/{layer_index}/activation
+
+    Responsibilities:
+    -----------------
+    - Ensure the correct archive group exists
+    - Validate activation shape
+    - Write the activation array to the appropriate location
+
+    Parameters
+    ----------
+    path : str
+        Root path to the Zarr archive.
+
+    layer_index : int
+        Index of the transformer layer.
+
+    activation_array : numpy.ndarray
+        Activation tensor with shape (tokens, hidden_dim).
+
+    Returns
+    -------
+    None
+    """
+    pass
+
+
+# ============================================================
+# METHOD 4
+# ============================================================
+
+def store_pair_representation(path, pair_array):
+    """
+    Store pair representation embeddings.
+
+    Pair representations capture relationships between residues
+    or tokens in the model and are commonly used in protein
+    structure prediction models like OpenFold.
+
+    Typical shape:
+        (tokens, tokens, pair_dimension)
+
+    Archive layout:
+        representations/pair
+
+    Responsibilities:
+    -----------------
+    - Validate input shape
+    - Create representations group if needed
+    - Store pair representation array
+
+    Parameters
+    ----------
+    path : str
+        Root path to the Zarr archive.
+
+    pair_array : numpy.ndarray
+        Pair representation tensor.
+
+    Returns
+    -------
+    None
+    """
+    pass
+
+
+# ============================================================
+# METHOD 5
+# ============================================================
+
+def store_attention_heads(path, layer_index, attention_array):
+    """
+    Store attention head maps for a transformer layer.
+
+    Attention maps describe relationships between tokens and
+    are commonly visualized to interpret model behavior.
+
+    Expected tensor shape:
+        (num_heads, tokens, tokens)
+
+    Archive layout:
+        layers/{layer_index}/attention
+
+    Recommended chunking:
+        (1, tokens, tokens)
+
+    This chunking allows loading a single attention head without
+    loading the entire tensor.
+
+    Responsibilities:
+    -----------------
+    - Validate tensor shape
+    - Ensure correct archive structure exists
+    - Store the attention maps
+
+    Parameters
+    ----------
+    path : str
+        Root path to the archive.
+
+    layer_index : int
+        Transformer layer index.
+
+    attention_array : numpy.ndarray
+        Attention tensor.
+
+    Returns
+    -------
+    None
+    """
+    pass
+
+
+# ============================================================
+# METHOD 6
+# ============================================================
+
+def store_structure_coordinates(path, coordinates, residue_types=None):
+    """
+    Store predicted protein structure coordinates.
+
+    These coordinates represent the predicted 3D structure of
+    a protein sequence.
+
+    Expected coordinate shape:
+        (num_residues, 3)
+
+    Archive layout:
+        structure/coordinates
+        structure/residue_types (optional)
+
+    Responsibilities:
+    -----------------
+    - Validate coordinate dimensions
+    - Create structure group
+    - Store coordinate array
+    - Optionally store residue type information
+
+    Parameters
+    ----------
+    path : str
+        Root path to the Zarr archive.
+
+    coordinates : numpy.ndarray
+        Array of atomic coordinates.
+
+    residue_types : optional array-like
+        Residue identity information.
+
+    Returns
+    -------
+    None
+    """
+    pass
+
+
+# ============================================================
+# METHOD 7
+# ============================================================
+
+def load_attention_head(path, layer_index, head_index):
+    """
+    Load a single attention head from the archive.
+
+    Selective loading is important for visualization because
+    attention tensors can be very large.
+
+    This function retrieves only the requested head.
+
+    Archive location:
+        layers/{layer_index}/attention
+
+    Expected output shape:
+        (tokens, tokens)
+
+    Parameters
+    ----------
+    path : str
+        Root path to the archive.
+
+    layer_index : int
+        Transformer layer index.
+
+    head_index : int
+        Index of the attention head.
+
+    Returns
+    -------
+    numpy.ndarray
+        Attention matrix for the specified head.
+    """
+    pass
+
+
+# ============================================================
+# METHOD 8
+# ============================================================
+
+def validate_archive(path):
+    """
+    Validate the integrity of a VizFold trace archive.
+
+    This function checks whether the expected archive structure
+    exists and whether key datasets appear to be valid.
+
+    Validation checks may include:
+    ------------------------------
+    - Presence of required groups:
+        layers/
+        representations/
+        structure/
+
+    - Valid shapes for:
+        activations
+        attention maps
+        pair representations
+        structure coordinates
+
+    - Metadata consistency if present.
+
+    The goal is to ensure the archive can be safely used for
+    offline visualization and analysis.
+
+    Parameters
+    ----------
+    path : str
+        Root path to the Zarr archive.
+
+    Returns
+    -------
+    bool
+        True if the archive appears valid, False otherwise.
+    """
+    pass
