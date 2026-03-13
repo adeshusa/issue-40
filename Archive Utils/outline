@@ -38,6 +38,9 @@ trace.zarr/
 
 import numpy as np
 import zarr
+import os
+import pickle
+import re
 
 
 # ============================================================
@@ -74,7 +77,14 @@ def tensor_to_numpy(tensor):
     numpy.ndarray
         A CPU-based NumPy representation of the tensor.
     """
-    pass
+    if isinstance(tensor, np.ndarray):
+        return tensor
+
+    # Support PyTorch tensors without importing torch as a hard dependency.
+    if hasattr(tensor, "detach") and hasattr(tensor, "cpu"):
+        return tensor.detach().cpu().numpy()
+
+    return np.asarray(tensor)
 
 
 # ============================================================
@@ -118,7 +128,49 @@ def tensor_to_zarr_array(path, tensor, chunks=None, overwrite=False):
     -------
     None
     """
-    pass
+    import os
+    array = tensor_to_numpy(tensor)
+
+    if ":" in path:
+        archive_path, dataset_path = path.split("::", 1)
+        if not dataset_path:
+            raise ValueError("Dataset path is empty. Use 'archive.zarr::group/dataset'.")
+
+        root = zarr.open(archive_path, mode="a")
+        if "/" in dataset_path:
+            parent_path, dataset_name = dataset_path.rsplit("/", 1)
+            parent_group = root.require_group(parent_path)
+        else:
+            parent_group = root
+            dataset_name = dataset_path
+
+        if dataset_name in parent_group and not overwrite:
+            raise FileExistsError(
+                f"Dataset already exists at '{dataset_path}'. "
+                "Set overwrite=True to replace it."
+            )
+
+        if dataset_name in parent_group:
+            del parent_group[dataset_name]
+
+        parent_group[dataset_name] = zarr.array(array, chunks=chunks)
+        return parent_group[dataset_name]
+
+    if os.path.exists(path) and not overwrite:
+        raise FileExistsError(
+            f"Zarr array already exists at '{path}'. Set overwrite=True to replace it."
+        )
+
+    mode = "w" if overwrite else "w-"
+    z = zarr.open_array(
+        store=path,
+        mode=mode,
+        shape=array.shape,
+        dtype=array.dtype,
+        chunks=chunks,
+    )
+    z[...] = array
+    return z
 
 
 # ============================================================
@@ -439,3 +491,153 @@ def validate_archive(path):
         True if the archive appears valid, False otherwise.
     """
     pass
+
+
+def ingest_attention_txt(archive_path, txt_file, layer_index, num_tokens, overwrite=False):
+    """
+    Parse a VizFold attention text file and store it under layers/{layer_index}/attention.
+
+    Expected input format:
+        Layer <idx>, Head <idx>
+        <res_i> <res_j> <score>
+        ...
+    """
+    if num_tokens <= 0:
+        raise ValueError("num_tokens must be a positive integer")
+
+    header_pattern = re.compile(r"^Layer\s+(\d+),\s+Head\s+(\d+)$", re.IGNORECASE)
+    heads = {}
+    current_head = None
+
+    with open(txt_file, "r") as f:
+        for raw_line in f:
+            line = raw_line.strip()
+            if not line:
+                continue
+
+            header_match = header_pattern.match(line)
+            if header_match:
+                file_layer_idx = int(header_match.group(1))
+                if file_layer_idx != layer_index:
+                    raise ValueError(
+                        f"Layer mismatch: function arg layer_index={layer_index}, "
+                        f"file header layer={file_layer_idx}"
+                    )
+                current_head = int(header_match.group(2))
+                heads.setdefault(current_head, [])
+                continue
+
+            if current_head is None:
+                raise ValueError("Found attention row before any layer/head header")
+
+            parts = line.split()
+            if len(parts) != 3:
+                raise ValueError(f"Malformed attention row: '{line}'")
+
+            res_i = int(float(parts[0]))
+            res_j = int(float(parts[1]))
+            score = float(parts[2])
+
+            if not (0 <= res_i < num_tokens and 0 <= res_j < num_tokens):
+                raise ValueError(
+                    f"Residue index out of bounds for num_tokens={num_tokens}: "
+                    f"({res_i}, {res_j})"
+                )
+
+            heads[current_head].append((res_i, res_j, score))
+
+    if not heads:
+        raise ValueError(f"No attention data found in '{txt_file}'")
+
+    num_heads = max(heads.keys()) + 1
+    attention = np.zeros((num_heads, num_tokens, num_tokens), dtype=np.float32)
+
+    for head_idx, entries in heads.items():
+        for res_i, res_j, score in entries:
+            attention[head_idx, res_i, res_j] = score
+
+    store_attention_heads(archive_path, layer_index, attention)
+    return {
+        "layer_index": layer_index,
+        "num_heads": num_heads,
+        "num_tokens": num_tokens,
+        "source_file": txt_file,
+    }
+
+
+def _extract_first_matching_array(container, key_substrings):
+    """Depth-first search for the first array-like value whose key path matches substrings."""
+    key_substrings = [s.lower() for s in key_substrings]
+
+    def _walk(obj, path_prefix=""):
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                path = f"{path_prefix}/{k}" if path_prefix else str(k)
+                lowered = path.lower()
+                if all(s in lowered for s in key_substrings):
+                    arr = tensor_to_numpy(v)
+                    if isinstance(arr, np.ndarray):
+                        return arr
+                found = _walk(v, path)
+                if found is not None:
+                    return found
+        elif isinstance(obj, (list, tuple)):
+            for idx, v in enumerate(obj):
+                path = f"{path_prefix}/{idx}" if path_prefix else str(idx)
+                found = _walk(v, path)
+                if found is not None:
+                    return found
+        return None
+
+    return _walk(container)
+
+
+def ingest_output_pkl(archive_path, pkl_file, overwrite=False):
+    """
+    Load a VizFold/OpenFold output .pkl and route known arrays into the archive.
+
+    Current routing behavior:
+    - final_atom_positions (N, 37, 3) -> structure/coordinates using CA atom (index 1)
+    - residue_types/aatype (if found) -> structure/residue_types
+    - pair representation (if found) -> representations/pair
+    """
+    with open(pkl_file, "rb") as f:
+        output_dict = pickle.load(f)
+
+    if not isinstance(output_dict, dict):
+        raise ValueError("Expected pickle file to contain a dictionary output")
+
+    summary = {
+        "source_file": pkl_file,
+        "stored": [],
+        "skipped": [],
+    }
+
+    final_positions = _extract_first_matching_array(output_dict, ["final", "atom", "positions"])
+    residue_types = _extract_first_matching_array(output_dict, ["aatype"])
+    if residue_types is None:
+        residue_types = _extract_first_matching_array(output_dict, ["residue", "type"])
+
+    if final_positions is not None:
+        if final_positions.ndim == 3 and final_positions.shape[-1] == 3:
+            coords = final_positions[:, 1, :] if final_positions.shape[1] > 1 else final_positions[:, 0, :]
+            store_structure_coordinates(archive_path, coords, residue_types=residue_types)
+            summary["stored"].append("structure/coordinates")
+            if residue_types is not None:
+                summary["stored"].append("structure/residue_types")
+        else:
+            summary["skipped"].append("final_atom_positions (unexpected shape)")
+    else:
+        summary["skipped"].append("final_atom_positions (not found)")
+
+    pair_array = _extract_first_matching_array(output_dict, ["pair"])
+    if pair_array is not None and isinstance(pair_array, np.ndarray):
+        if pair_array.ndim == 3 and pair_array.shape[0] == pair_array.shape[1]:
+            store_pair_representation(archive_path, pair_array)
+            summary["stored"].append("representations/pair")
+        else:
+            summary["skipped"].append("representations/pair (unexpected shape)")
+    else:
+        summary["skipped"].append("representations/pair (not found)")
+
+    return summary
