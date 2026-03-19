@@ -448,7 +448,40 @@ def load_attention_head(path, layer_index, head_index):
     numpy.ndarray
         Attention matrix for the specified head.
     """
-    pass
+    root = zarr.open(path, mode='r')
+ 
+    layer_key = f"layers/{layer_index}"
+    if layer_key not in root:
+        raise KeyError(
+            f"Layer {layer_index} not found in archive at '{path}'. "
+            f"Expected group '{layer_key}'."
+        )
+ 
+    layer_group = root[layer_key]
+ 
+    if "attention" not in layer_group:
+        raise KeyError(
+            f"No attention data found for layer {layer_index} "
+            f"in archive at '{path}'."
+        )
+ 
+    attention = layer_group["attention"]
+ 
+    if attention.ndim != 3:
+        raise ValueError(
+            f"Expected stored attention to be 3D (num_heads, tokens, tokens), "
+            f"got {attention.ndim}D with shape {attention.shape}"
+        )
+ 
+    num_heads = attention.shape[0]
+ 
+    if head_index < 0 or head_index >= num_heads:
+        raise IndexError(
+            f"head_index {head_index} is out of range for layer {layer_index} "
+            f"which has {num_heads} attention head(s)."
+        )
+ 
+    return attention[head_index]
 
 
 # ============================================================
