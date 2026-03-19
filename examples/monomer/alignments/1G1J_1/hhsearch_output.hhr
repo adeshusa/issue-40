@@ -1,0 +1,739 @@
+Query         1G1J_1 
+Match_columns 43
+No_of_seqs    30 out of 73
+Neff          2.02463
+Searched_HMMs 80799
+Date          Mon Mar 17 17:25:27 2025
+Command       /u/thayes/anaconda3/envs/openfold_env/bin/hhsearch -i /tmp/tmp81dg0jhp/query.a3m -o /u/thayes/vizfold/output_dirs/my_outputs_align_1G1J/alignments/1G1J_1/hhsearch_output.hhr -maxseq 1000000 -cpu 2 -d /ime/hdd/rhaas/SUP-5301/database/pdb70/pdb70 
+
+ No Hit                             Prob E-value P-value  Score    SS Cols Query HMM  Template HMM
+  1 1G1I_A NON-STRUCTURAL GLYCOPRO  99.9 4.2E-27 5.2E-32  130.5   0.0   43    1-43      1-43  (43)
+  2 1G1J_A NON-STRUCTURAL GLYCOPRO  99.9 4.2E-27 5.2E-32  130.5   0.0   43    1-43      1-43  (43)
+  3 5Y2H_A Nonstructural protein 4  99.9   8E-27 9.9E-32  132.8   0.0   43    1-43      6-48  (51)
+  4 5Y2H_C Nonstructural protein 4  99.9   8E-27 9.9E-32  132.8   0.0   43    1-43      6-48  (51)
+  5 5Y9R_A Nonstructural protein 4  99.9   9E-27 1.1E-31  130.6   0.0   43    1-43      2-44  (46)
+  6 2O1K_B Non-structural glycopro  99.9 1.3E-26 1.6E-31  132.4   0.0   43    1-43      1-43  (52)
+  7 3MIW_D Viral Protein; ROTAVIRU  99.9 1.3E-26 1.7E-31  132.7   0.0   43    1-43      2-44  (53)
+  8 2XKV_C SIGNAL RECOGNITION PART  51.4      12 0.00015   21.5   0.0   25   10-34     10-34  (69)
+  9 2JQE_A Signal recognition 54 k  47.5      15 0.00019   22.9   0.0   27    8-34     51-77  (119)
+ 10 4UE4_C FTSQ SIGNAL SEQUENCE, S  46.9      16  0.0002   22.1   0.0   27    8-34     40-66  (102)
+ 11 5AKA_5 50S RIBOSOMAL PROTEIN L  43.0      20 0.00025   22.0   0.0   26    8-33     42-67  (109)
+ 12 3ZN8_M SIGNAL RECOGNITION PART  42.1      21 0.00026   22.4   0.0   27    8-34     64-90  (125)
+ 13 1HQ1_A SIGNAL RECOGNITION PROT  41.4      22 0.00027   21.7   0.0   26    8-33     42-67  (105)
+ 14 3NDB_B Signal recognition part  31.7      40  0.0005   24.0   0.0   26    8-33    365-390 (454)
+ 15 4XCO_C SRP19, SRP54-signal seq  29.7      46 0.00056   22.5   0.0   26    8-33     64-89  (173)
+ 16 4XCO_D SRP19, SRP54-signal seq  29.7      46 0.00056   22.5   0.0   26    8-33     64-89  (173)
+ 17 5NCO_i 50S ribosomal protein L  29.7      46 0.00056   23.7   0.0   26    8-33    366-391 (450)
+ 18 2V3C_C SIGNAL RECOGNITION PART  29.3      47 0.00058   23.5   0.0   27    8-34    365-391 (432)
+ 19 1MFQ_C SIGNAL RECOGNITION PART  28.7      48  0.0006   21.2   0.0   26    7-32     55-80  (129)
+ 20 2FFH_A PROTEIN (425-MER); FFH,  27.5      53 0.00065   23.1   0.0   24   10-33    357-380 (425)
+ 21 4CZ5_B CELLULAR TUMOR ANTIGEN   27.2      54 0.00067   17.0   0.0   20   22-41      9-28  (33)
+ 22 4CZ6_D CELLULAR TUMOR ANTIGEN   27.2      54 0.00067   17.0   0.0   20   22-41      9-28  (33)
+ 23 4CZ7_A CELLULAR TUMOR ANTIGEN   27.2      54 0.00067   17.0   0.0   20   22-41      9-28  (33)
+ 24 1QB2_B HUMAN PROTEIN SRP54M; A  26.5      56  0.0007   20.0   0.0   27    6-32     41-67  (109)
+ 25 1PES_B TUMOR ANTIGEN P53 (TETR  26.5      56  0.0007   16.6   0.0   20   22-41      6-25  (31)
+ 26 3ZY0_A TUMOR PROTEIN P63; TRAN  26.5      56  0.0007   16.7   0.0   20   22-41      8-27  (32)
+ 27 3ZY0_D TUMOR PROTEIN P63; TRAN  26.5      56  0.0007   16.7   0.0   20   22-41      8-27  (32)
+ 28 5XHX_A Helix-turn-helix transc  26.2      58 0.00071   18.5   0.0   13   17-29    182-194 (195)
+ 29 5XHX_B Helix-turn-helix transc  26.2      58 0.00071   18.5   0.0   13   17-29    182-194 (195)
+ 30 3TRT_B Vimentin; cytoskeleton,  26.0      58 0.00072   16.9   0.0   23    5-27      7-29  (77)
+ 31 2PAG_A Hypothetical protein; N  25.8      59 0.00073   18.1   0.0   27    5-31      1-31  (135)
+ 32 1AIE_A P53; P53 TETRAMERIZATIO  25.7      60 0.00074   16.6   0.0   20   22-41      5-24  (31)
+ 33 3KL4_A Signal recognition 54 k  25.2      62 0.00076   22.8   0.0   26    8-33    371-396 (433)
+ 34 3KFU_G Non-discriminating and   25.1      62 0.00077   18.4   0.0   29    3-31     25-53  (92)
+ 35 3KFU_J Non-discriminating and   25.1      62 0.00077   18.4   0.0   29    3-31     25-53  (92)
+ 36 2XXA_C SIGNAL RECOGNITION PART  25.0      63 0.00078   22.7   0.0   26    8-33    369-394 (433)
+ 37 3ZY1_A TUMOR PROTEIN 63; TRANS  24.7      64 0.00079   17.4   0.0   20   22-41      8-27  (46)
+ 38 6JWP_C GTP-binding protein GTR  24.3      66 0.00081   22.0   0.0   31   11-41     10-41  (129)
+ 39 2IY3_A SIGNAL RECOGNITION PART  23.8      68 0.00085   22.5   0.0   27    8-34    370-396 (432)
+ 40 2WQJ_C TUMOR PROTEIN P73; P73,  23.4      70 0.00087   16.6   0.0   20   22-41      9-28  (35)
+ 41 2WQJ_G TUMOR PROTEIN P73; P73,  23.4      70 0.00087   16.6   0.0   20   22-41      9-28  (35)
+ 42 2MW4_A Transcription factor pr  23.2      72 0.00089   17.3   0.0   20   22-41      9-28  (47)
+ 43 5GAD_i 50S ribosomal protein L  22.1      78 0.00096   22.6   0.0   26    8-33    366-391 (450)
+ 44 4D1L_E CELLULAR TUMOR ANTIGEN   21.9      79 0.00098   17.3   0.0   20   22-41      9-28  (48)
+ 45 4D1M_E CELLULAR TUMOR ANTIGEN   21.9      79 0.00098   17.3   0.0   20   22-41      9-28  (48)
+ 46 1QZW_G Signal recognition 54 k  21.8      79 0.00098   22.4   0.0   28    7-34    377-404 (440)
+ 47 5HOB_C Tumor protein p73; tran  21.3      83   0.001   17.3   0.0   20   22-41      9-28  (50)
+ 48 1SAK_A TUMOR SUPPRESSOR P53; A  20.5      88  0.0011   17.0   0.0   20   22-41     12-31  (42)
+ 49 2NB1_B Tumor protein 63, Tumor  20.5      88  0.0011   17.2   0.0   20   22-41      9-28  (50)
+
+No 1
+>1G1I_A NON-STRUCTURAL GLYCOPROTEIN NSP4; NS28, parallel coiled-coil, homo-tetramer, metal; HET: MSE; 2.0A {N/A} SCOP: h.1.13.1
+Probab=99.88  E-value=4.2e-27  Score=130.49  Aligned_cols=43  Identities=100%  Similarity=1.268  Sum_probs=41.3  Template_Neff=2.300
+
+Q 1G1J_1            1 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIYDKLTVQ   43 (43)
+Q Consensus         1 iekqmdrivkEmrrqlemIdkLTTREieQvELLkri~d~l~vq   43 (43)
+                      +|+||||||||||||++|||+|||||+|||||||||||+|+++
+T Consensus         1 ie~qm~rivkemrrQ~emidkLTtrEiEQVeLLkrIyd~L~~~   43 (43)
+T 1G1I_A            1 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIYDKLTVQ   43 (43)
+T ss_dssp             CHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHTSCC
+T ss_pred             CHHHHHHHHHHHHHHHHHHHHhchHHHHHHHHHHHHHHHhhcC
+Confidence            6899999999999999999999999999999999999999864
+
+
+No 2
+>1G1J_A NON-STRUCTURAL GLYCOPROTEIN NSP4; NS28, parallel coiled-coil, homo-tetramer, metal; HET: MSE; 1.86A {N/A} SCOP: h.1.13.1
+Probab=99.88  E-value=4.2e-27  Score=130.49  Aligned_cols=43  Identities=100%  Similarity=1.268  Sum_probs=41.3  Template_Neff=2.300
+
+Q 1G1J_1            1 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIYDKLTVQ   43 (43)
+Q Consensus         1 iekqmdrivkEmrrqlemIdkLTTREieQvELLkri~d~l~vq   43 (43)
+                      +|+||||||||||||++|||+|||||+|||||||||||+|+++
+T Consensus         1 ie~qm~rivkemrrQ~emidkLTtrEiEQVeLLkrIyd~L~~~   43 (43)
+T 1G1J_A            1 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIYDKLTVQ   43 (43)
+T ss_dssp             CHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHSCC
+T ss_pred             CHHHHHHHHHHHHHHHHHHHHhchHHHHHHHHHHHHHHHhhcC
+Confidence            6899999999999999999999999999999999999999864
+
+
+No 3
+>5Y2H_A Nonstructural protein 4; Antiparallel tetramer NSP4 Rotavirus Coiled-coil; 2.6A {Bovine rotavirus G10}
+Probab=99.87  E-value=8e-27  Score=132.83  Aligned_cols=43  Identities=95%  Similarity=1.171  Sum_probs=41.5  Template_Neff=2.400
+
+Q 1G1J_1            1 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIYDKLTVQ   43 (43)
+Q Consensus         1 iekqmdrivkEmrrqlemIdkLTTREieQvELLkri~d~l~vq   43 (43)
+                      ||+||||||+|||||++|||+|||||||||||||||||+|+++
+T Consensus         6 ie~qmdrivkemrrQlemidkLTtREiEQVeLLkrIyd~L~~~   48 (51)
+T 5Y2H_A            6 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIHDKLVVQ   48 (51)
+T ss_dssp             HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+T ss_pred             HHHHHHHHHHHHHHHHHHHHHcchHHHHHHHHHHHHHHHhhhc
+Confidence            6899999999999999999999999999999999999999875
+
+
+No 4
+>5Y2H_C Nonstructural protein 4; Antiparallel tetramer NSP4 Rotavirus Coiled-coil; 2.6A {Bovine rotavirus G10}
+Probab=99.87  E-value=8e-27  Score=132.83  Aligned_cols=43  Identities=95%  Similarity=1.171  Sum_probs=41.5  Template_Neff=2.400
+
+Q 1G1J_1            1 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIYDKLTVQ   43 (43)
+Q Consensus         1 iekqmdrivkEmrrqlemIdkLTTREieQvELLkri~d~l~vq   43 (43)
+                      ||+||||||+|||||++|||+|||||||||||||||||+|+++
+T Consensus         6 ie~qmdrivkemrrQlemidkLTtREiEQVeLLkrIyd~L~~~   48 (51)
+T 5Y2H_C            6 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIHDKLVVQ   48 (51)
+T ss_dssp             HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHCC
+T ss_pred             HHHHHHHHHHHHHHHHHHHHHcchHHHHHHHHHHHHHHHhhhc
+Confidence            6899999999999999999999999999999999999999875
+
+
+No 5
+>5Y9R_A Nonstructural protein 4; antiparallel, tetramer, coiled-coil, nickel bound; HET: EDO; 2.2A {Bovine rotavirus G10}
+Probab=99.87  E-value=9e-27  Score=130.57  Aligned_cols=43  Identities=95%  Similarity=1.171  Sum_probs=41.6  Template_Neff=2.300
+
+Q 1G1J_1            1 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIYDKLTVQ   43 (43)
+Q Consensus         1 iekqmdrivkEmrrqlemIdkLTTREieQvELLkri~d~l~vq   43 (43)
+                      ||+||||||+|||||++|||+|||||+|||||||||||+|+++
+T Consensus         2 ie~qmdrivkemrrQlemidkLTtREiEQVeLLkrIyd~L~~k   44 (46)
+T 5Y9R_A            2 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIHDKLVVQ   44 (46)
+T ss_dssp             CHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+T ss_pred             hHHHHHHHHHHHHHHHHHHHHhchHHHHHHHHHHHHHHHhhcc
+Confidence            6899999999999999999999999999999999999999875
+
+
+No 6
+>2O1K_B Non-structural glycoprotein NSP4; Rotavirus Enterotoxin, Nonstructural protein, NSP4; 1.67A {Simian rotavirus A/SA11}
+Probab=99.87  E-value=1.3e-26  Score=132.38  Aligned_cols=43  Identities=100%  Similarity=1.268  Sum_probs=41.5  Template_Neff=2.400
+
+Q 1G1J_1            1 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIYDKLTVQ   43 (43)
+Q Consensus         1 iekqmdrivkEmrrqlemIdkLTTREieQvELLkri~d~l~vq   43 (43)
+                      ||+||||||+|||||++|||+|||||+|||||||||||+|+++
+T Consensus         1 ie~qmdrivkemrrQlemidkLTtREiEQVeLLkrIyd~L~~k   43 (52)
+T 2O1K_B            1 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIYDKLTVQ   43 (52)
+T ss_dssp             CHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHC
+T ss_pred             CHHHHHHHHHHHHHHHHHHHHcchHHHHHHHHHHHHHHHhccc
+Confidence            6899999999999999999999999999999999999999875
+
+
+No 7
+>3MIW_D Viral Protein; ROTAVIRUS ENTEROTOXIN, NON STRUCTURAL PROTEIN; HET: EDO; 2.5A {Human rotavirus G4}
+Probab=99.87  E-value=1.3e-26  Score=132.69  Aligned_cols=43  Identities=81%  Similarity=1.095  Sum_probs=39.4  Template_Neff=2.400
+
+Q 1G1J_1            1 IEKQMDRVVKEMRRQLEMIDKLTTREIEQVELLKRIYDKLTVQ   43 (43)
+Q Consensus         1 iekqmdrivkEmrrqlemIdkLTTREieQvELLkri~d~l~vq   43 (43)
+                      ||+||||||||||||++|||+|||||+|||||||||||+|+++
+T Consensus         2 ie~qmdrivkemrrQlemidkLTtREIEQVeLLkrIyd~Li~k   44 (53)
+T 3MIW_D            2 IEQQMDRIVKEMRRQLEMIDKLTTREIEQIELLKRIHDNLITR   44 (53)
+T ss_dssp             HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHSCC---
+T ss_pred             hHHHHHHHHHHHHHHHHHHHHcchHHHHHHHHHHHHHHHcccc
+Confidence            6899999999999999999999999999999999999999875
+
+
+No 8
+>2XKV_C SIGNAL RECOGNITION PARTICLE PROTEIN (E.C.3.6.5.4); PROTEIN TRANSPORT; 13.5A {ESCHERICHIA COLI}
+Probab=51.42  E-value=12  Score=21.55  Aligned_cols=25  Identities=28%  Similarity=0.434  Sum_probs=22.1  Template_Neff=6.100
+
+Q 1G1J_1           10 KEMRRQLEMIDKLTTREIEQVELLK   34 (43)
+Q Consensus        10 kEmrrqlemIdkLTTREieQvELLk   34 (43)
+                      +++++-+.+|+..|+.|.+..++|.
+T Consensus        10 ~~lkr~~~IidSMT~~Er~~p~~l~   34 (69)
+T 2XKV_C           10 KVLVRMEAIINSMTMKERAKPEIIK   34 (69)
+T ss_dssp             CHHHHHHHHHHTSCHHHHHCGGGCC
+T ss_pred             HHHHHHHHHHHcCCHHHHhChhHcC
+Confidence            6788889999999999999988873
+
+
+No 9
+>2JQE_A Signal recognition 54 kDa protein; af54, srp54, solution, SIGNALING PROTEIN; NMR {Archaeoglobus fulgidus}
+Probab=47.47  E-value=15  Score=22.85  Aligned_cols=27  Identities=15%  Similarity=0.361  Sum_probs=23.5  Template_Neff=6.500
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELLK   34 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELLk   34 (43)
+                      -.+++++-..+||..|+.|.+..++|.
+T Consensus        51 ~~~~lk~~~~Ii~SMT~~Er~~P~~i~   77 (119)
+T 2JQE_A           51 TQEKMKKFRVIMDSMTEEELLNPKIID   77 (119)
+T ss_dssp             CCCHHHHHHHHHHHSCHHHHHCGGGCC
+T ss_pred             cHHHHHHHHHHHhcCCHHHHhChhhcC
+Confidence            456789999999999999999999883
+
+
+No 10
+>4UE4_C FTSQ SIGNAL SEQUENCE, SIGNAL RECOGNITION; SIGNAL RECOGNITION PARTICLE (SRP), STALLED-RIBOSOME; 7.0A {BACILLUS SUBTILIS SUBSP. SUBTILIS STR. 168}
+Probab=46.91  E-value=16  Score=22.09  Aligned_cols=27  Identities=22%  Similarity=0.308  Sum_probs=23.2  Template_Neff=6.700
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELLK   34 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELLk   34 (43)
+                      --+++++-.-+|+..|+.|.+..++++
+T Consensus        40 ~~~~lk~~~~ii~SMT~~Er~~p~~i~   66 (102)
+T 4UE4_C           40 DEKQLNHVEAIIKSMTVLEKEQPDIIN   66 (102)
+T ss_dssp             SCSSTTTHHHHHHHSCHHHHHCGGGCC
+T ss_pred             CHHHHHHHHHHHHhCCHHHHhChhhcC
+Confidence            455788889999999999999998883
+
+
+No 11
+>5AKA_5 50S RIBOSOMAL PROTEIN L32, 50S; PROTEIN TARGETING, SIGNAL RECOGNITION PARTICLE; HET: MG; 5.7A {ESCHERICHIA COLI K-12}
+Probab=42.98  E-value=20  Score=21.97  Aligned_cols=26  Identities=23%  Similarity=0.303  Sum_probs=22.5  Template_Neff=6.600
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELL   33 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELL   33 (43)
+                      --+++++-..+||..|+.|++..+++
+T Consensus        42 ~~~~lk~~~~ii~SMT~~Er~~p~~i   67 (109)
+T 5AKA_5           42 DDKVLVRMEAIINSMTMKERAKPEII   67 (109)
+T ss_pred             CHHHHHHHHHHHHhCCHHHHhChHHc
+Confidence            34567888899999999999999888
+
+
+No 12
+>3ZN8_M SIGNAL RECOGNITION PARTICLE PROTEIN (E.C.3.6.5.4); PROTEIN TRANSPORT, HYDROLASE; 12.0A {ESCHERICHIA COLI}
+Probab=42.06  E-value=21  Score=22.42  Aligned_cols=27  Identities=22%  Similarity=0.455  Sum_probs=23.6  Template_Neff=6.500
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELLK   34 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELLk   34 (43)
+                      -.+++++-..+||..|+.|++..++++
+T Consensus        64 ~~~~lkr~~~IidSMT~~Er~~p~~i~   90 (125)
+T 3ZN8_M           64 GEEKIRRWLAALNSMTYKELENPNIID   90 (125)
+T ss_pred             hHHHHHHHHHHHhcCCHHHHhCchhcC
+Confidence            456788999999999999999998883
+
+
+No 13
+>1HQ1_A SIGNAL RECOGNITION PROTEIN/RNA COMPLEX; PROTEIN-RNA COMPLEX, DOUBLE HELIX, TETRALOOP; 1.52A {Escherichia coli} SCOP: a.36.1.1
+Probab=41.41  E-value=22  Score=21.66  Aligned_cols=26  Identities=23%  Similarity=0.303  Sum_probs=22.5  Template_Neff=6.600
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELL   33 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELL   33 (43)
+                      --+++++-..+|+..|+.|++..+++
+T Consensus        42 ~~~~lk~~~~Ii~SMT~~Er~~p~~i   67 (105)
+T 1HQ1_A           42 DDKVLVRMEAIINSMTMKERAKPEII   67 (105)
+T ss_dssp             CCSSHHHHHHHHHTSCHHHHHCGGGC
+T ss_pred             CHHHHHHHHHHHHhCCHHHHhChHHc
+Confidence            34568888899999999999999988
+
+
+No 14
+>3NDB_B Signal recognition particle 19 kDa; protein-RNA complex, signal recognition particle; 3.0A {Methanocaldococcus jannaschii}
+Probab=31.68  E-value=40  Score=24.03  Aligned_cols=26  Identities=15%  Similarity=0.316  Sum_probs=23.0  Template_Neff=8.600
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELL   33 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELL   33 (43)
+                      -.++|++...+|+.+|..|++..+++
+T Consensus       365 ~~~~~~~~~~ii~sMt~~Er~~p~~~  390 (454)
+T 3NDB_B          365 TEAKIKKYKVIISSMTKEERENPKII  390 (454)
+T ss_dssp             CHHHHHHHHHHHTTSCHHHHHCGGGC
+T ss_pred             CHHHHHHHHHHHhcCCHHHHhCchhc
+Confidence            34678889999999999999999988
+
+
+No 15
+>4XCO_C SRP19, SRP54-signal sequence fusion protein/RNA; SIGNAL RECOGNITION PARTICLE, SIGNAL SEQUENCE; HET: MG; 2.9A {Methanocaldococcus jannaschii}
+Probab=29.70  E-value=46  Score=22.50  Aligned_cols=26  Identities=15%  Similarity=0.316  Sum_probs=22.8  Template_Neff=5.800
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELL   33 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELL   33 (43)
+                      -.+++++-..+||..|+.|++..+++
+T Consensus        64 ~e~~lkk~~~IidSMT~eEr~~P~~i   89 (173)
+T 4XCO_C           64 TEAKIKKYKVIISSMTKEERENPKII   89 (173)
+T ss_dssp             CHHHHHHHHHHHTTSCHHHHHCTTSC
+T ss_pred             CHHHHHHHHHHHhcCCHHHHhCchhc
+Confidence            34678899999999999999998888
+
+
+No 16
+>4XCO_D SRP19, SRP54-signal sequence fusion protein/RNA; SIGNAL RECOGNITION PARTICLE, SIGNAL SEQUENCE; HET: MG; 2.9A {Methanocaldococcus jannaschii}
+Probab=29.70  E-value=46  Score=22.50  Aligned_cols=26  Identities=15%  Similarity=0.316  Sum_probs=22.8  Template_Neff=5.800
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELL   33 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELL   33 (43)
+                      -.+++++-..+||..|+.|++..+++
+T Consensus        64 ~e~~lkk~~~IidSMT~eEr~~P~~i   89 (173)
+T 4XCO_D           64 TEAKIKKYKVIISSMTKEERENPKII   89 (173)
+T ss_pred             CHHHHHHHHHHHhcCCHHHHhCchhc
+Confidence            34678899999999999999998888
+
+
+No 17
+>5NCO_i 50S ribosomal protein L2, 50S; Ribosome, SRP, Sec translocon, SRP; HET: GDP, ALF; 4.8A {Escherichia coli}
+Probab=29.66  E-value=46  Score=23.73  Aligned_cols=26  Identities=23%  Similarity=0.303  Sum_probs=23.1  Template_Neff=8.600
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELL   33 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELL   33 (43)
+                      --++|++...+|+.+|+.|++..+++
+T Consensus       366 ~~~~~~~~~~ii~SMT~~Er~~p~~~  391 (450)
+T 5NCO_i          366 DDKVLVRMEAIINSMTMKERAKPEII  391 (450)
+T ss_dssp             HHHHHHHHHHHHTTSCHHHHHCGGGC
+T ss_pred             CHHHHHHHHHHHHcCCHHHHhChhHc
+Confidence            45678899999999999999999988
+
+
+No 18
+>2V3C_C SIGNAL RECOGNITION PARTICLE 19 KDA; NUCLEOTIDE-BINDING, SIGNAL RECOGNITION PARTICLE, RNA; 2.5A {METHANOCALDOCOCCUS JANNASCHII}
+Probab=29.29  E-value=47  Score=23.48  Aligned_cols=27  Identities=19%  Similarity=0.343  Sum_probs=20.5  Template_Neff=8.700
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELLK   34 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELLk   34 (43)
+                      --++|++...+|+.+|..|++..++++
+T Consensus       365 ~~~~~~~~~~ii~smt~~e~~~p~~~~  391 (432)
+T 2V3C_C          365 TEAKIKKYKVIISSMTKEERENPKIIK  391 (432)
+T ss_dssp             HHHHHHH---HHTTSCHHHHSSCTTCC
+T ss_pred             hHHHHHHHHHHHhcCCHHHHhCccccC
+Confidence            346788899999999999999999883
+
+
+No 19
+>1MFQ_C SIGNAL RECOGNITION PARTICLE 19 KDA; RNA-protein complex, A-minor motif, 3-helix; 3.1A {Homo sapiens} SCOP: a.36.1.1
+Probab=28.75  E-value=48  Score=21.22  Aligned_cols=26  Identities=8%  Similarity=0.418  Sum_probs=21.9  Template_Neff=6.100
+
+Q 1G1J_1            7 RVVKEMRRQLEMIDKLTTREIEQVEL   32 (43)
+Q Consensus         7 rivkEmrrqlemIdkLTTREieQvEL   32 (43)
+                      .-.+++++-..+||..|+.|++..++
+T Consensus        55 ~~~~~lk~~~~IidSMT~~Er~~p~~   80 (129)
+T 1MFQ_C           55 ESMARLKKLMTIMDSMNDQELDSTDG   80 (129)
+T ss_dssp             HHHHHHHHHHHHHTTSCHHHHTCTTH
+T ss_pred             hhHHHHHHHHHHHHcCCHHHHcCCch
+Confidence            45567888899999999999999764
+
+
+No 20
+>2FFH_A PROTEIN (425-MER); FFH, SRP54, SIGNAL RECOGNITION PARTICLE; HET: SO4, CD; 3.2A {Thermus aquaticus} SCOP: a.36.1.1, a.24.13.1, c.37.1.10
+Probab=27.54  E-value=53  Score=23.11  Aligned_cols=24  Identities=21%  Similarity=0.347  Sum_probs=21.9  Template_Neff=8.800
+
+Q 1G1J_1           10 KEMRRQLEMIDKLTTREIEQVELL   33 (43)
+Q Consensus        10 kEmrrqlemIdkLTTREieQvELL   33 (43)
+                      +++++..-+|+..|+.|++..+++
+T Consensus       357 ~~~~~~~~ii~sMt~~e~~~p~~~  380 (425)
+T 2FFH_A          357 KAIKRLEAIVLSMTPEERKDPRIL  380 (425)
+T ss_dssp             HHHHHHHHHHHTSCHHHHHCGGGC
+T ss_pred             HHHHHHHHHHHcCCHHHHhChhhc
+Confidence            678888899999999999999988
+
+
+No 21
+>4CZ5_B CELLULAR TUMOR ANTIGEN P53; CELL CYCLE, P53 FAMILY, TUMOR; 1.02A {DANIO RERIO}
+Probab=27.16  E-value=54  Score=16.98  Aligned_cols=20  Identities=40%  Similarity=0.599  Sum_probs=14.6  Template_Neff=5.100
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |.-|-++--|.|++|.|.|.
+T Consensus         9 L~Vrgre~ye~l~ki~e~LE   28 (33)
+T 4CZ5_B            9 LQVRGRERYEILKKLNDSLE   28 (33)
+T ss_dssp             EEEESHHHHHHHHHHHHHHH
+T ss_pred             EeccchhhHHHHHHHHHHHh
+Confidence            45566777788888888764
+
+
+No 22
+>4CZ6_D CELLULAR TUMOR ANTIGEN P53; ANTITUMOR PROTEIN, P53 FAMILY, TUMOR; 1.53A {DANIO RERIO}
+Probab=27.16  E-value=54  Score=16.98  Aligned_cols=20  Identities=40%  Similarity=0.599  Sum_probs=14.6  Template_Neff=5.100
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |.-|-++--|.|++|.|.|.
+T Consensus         9 L~Vrgre~ye~l~ki~e~LE   28 (33)
+T 4CZ6_D            9 LQVRGRERYEILKKLNDSLE   28 (33)
+T ss_dssp             EEEESHHHHHHHHHHHHHHH
+T ss_pred             EeccchhhHHHHHHHHHHHh
+Confidence            45566777788888888764
+
+
+No 23
+>4CZ7_A CELLULAR TUMOR ANTIGEN P53; CELL CYCLE, TUMOR SUPPRESSOR, TRANSCRIPTION; HET: PO4; 1.1A {DANIO RERIO}
+Probab=27.16  E-value=54  Score=16.98  Aligned_cols=20  Identities=40%  Similarity=0.599  Sum_probs=14.6  Template_Neff=5.100
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |.-|-++--|.|++|.|.|.
+T Consensus         9 L~Vrgre~ye~l~ki~e~LE   28 (33)
+T 4CZ7_A            9 LQVRGRERYEILKKLNDSLE   28 (33)
+T ss_dssp             EEEESHHHHHHHHHHHHHHH
+T ss_pred             EeccchhhHHHHHHHHHHHh
+Confidence            45566777788888888764
+
+
+No 24
+>1QB2_B HUMAN PROTEIN SRP54M; ALPHA-HELIX, HELIX-TURN-HELIX, SIGNALING PROTEIN; 2.1A {Homo sapiens} SCOP: a.36.1.1
+Probab=26.54  E-value=56  Score=20.01  Aligned_cols=27  Identities=7%  Similarity=0.414  Sum_probs=22.3  Template_Neff=6.700
+
+Q 1G1J_1            6 DRVVKEMRRQLEMIDKLTTREIEQVEL   32 (43)
+Q Consensus         6 drivkEmrrqlemIdkLTTREieQvEL   32 (43)
+                      +.-.+++++-..+||..|+.|.+.-++
+T Consensus        41 ~~~~~~lk~~~~ii~SMT~~Er~~p~~   67 (109)
+T 1QB2_B           41 QESMARLKKLMTIMDSMNDQELDSTDG   67 (109)
+T ss_dssp             HHHHHHHHHHHHHHTTSCHHHHHCTTH
+T ss_pred             hhhHHHHHHHHHHHHcCCHhHHhCCch
+Confidence            345677889999999999999999764
+
+
+No 25
+>1PES_B TUMOR ANTIGEN P53 (TETRAMERIZATION DOMAIN); DNA-BINDING; NMR {Homo sapiens} SCOP: a.53.1.1
+Probab=26.48  E-value=56  Score=16.58  Aligned_cols=20  Identities=25%  Similarity=0.488  Sum_probs=14.0  Template_Neff=5.300
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |.-|.++--+.|++|.|.|.
+T Consensus         6 L~Vrgre~ye~l~ki~e~LE   25 (31)
+T 1PES_B            6 LQIRGRERFEMFRELNEALE   25 (31)
+T ss_dssp             CCEEESHHHHHHHHHHHHHH
+T ss_pred             EeccchhhHHHHHHHHHHHH
+Confidence            44566677778888887764
+
+
+No 26
+>3ZY0_A TUMOR PROTEIN P63; TRANSCRIPTION, TRANSCRIPTION FACTOR, TETRAMERIZATION DOMAIN; 1.9A {HOMO SAPIENS}
+Probab=26.48  E-value=56  Score=16.74  Aligned_cols=20  Identities=35%  Similarity=0.463  Sum_probs=14.6  Template_Neff=5.200
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |.-|.++--+.|++|.|.|.
+T Consensus         8 L~Vrgre~ye~l~ki~e~Le   27 (32)
+T 3ZY0_A            8 LPVRGRETYEMLLKIKESLE   27 (32)
+T ss_dssp             EEESSHHHHHHHHHHHHHHH
+T ss_pred             eecccHHhHHHHHHHHHHHH
+Confidence            45566677788888888764
+
+
+No 27
+>3ZY0_D TUMOR PROTEIN P63; TRANSCRIPTION, TRANSCRIPTION FACTOR, TETRAMERIZATION DOMAIN; HET: MSE; 1.9A {HOMO SAPIENS}
+Probab=26.48  E-value=56  Score=16.74  Aligned_cols=20  Identities=35%  Similarity=0.463  Sum_probs=14.6  Template_Neff=5.200
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |.-|.++--+.|++|.|.|.
+T Consensus         8 L~Vrgre~ye~l~ki~e~Le   27 (32)
+T 3ZY0_D            8 LPVRGRETYEMLLKIKESLE   27 (32)
+T ss_dssp             EEESSHHHHHHHHHHHHHHH
+T ss_pred             eecccHHhHHHHHHHHHHHH
+Confidence            45566677788888888764
+
+
+No 28
+>5XHX_A Helix-turn-helix transcriptional regulator; autoinducer transcriptional regulator PAO1, TRANSCRIPTION; HET: CSO; 2.1A {Pseudomonas aeruginosa}
+Probab=26.21  E-value=58  Score=18.51  Aligned_cols=13  Identities=23%  Similarity=0.332  Sum_probs=0.0  Template_Neff=11.200
+
+Q 1G1J_1           17 EMIDKLTTREIEQ   29 (43)
+Q Consensus        17 emIdkLTTREieQ   29 (43)
+                      .-..+||+||.|.
+T Consensus       182 ~~~~~ls~re~~v  194 (195)
+T 5XHX_A          182 EEAKPIAAAEVEV  194 (195)
+T ss_dssp             -------------
+T ss_pred             hhccccchhhhcc
+Confidence            4567899999874
+
+
+No 29
+>5XHX_B Helix-turn-helix transcriptional regulator; autoinducer transcriptional regulator PAO1, TRANSCRIPTION; HET: CSO; 2.1A {Pseudomonas aeruginosa}
+Probab=26.21  E-value=58  Score=18.51  Aligned_cols=13  Identities=23%  Similarity=0.332  Sum_probs=0.0  Template_Neff=11.200
+
+Q 1G1J_1           17 EMIDKLTTREIEQ   29 (43)
+Q Consensus        17 emIdkLTTREieQ   29 (43)
+                      .-..+||+||.|.
+T Consensus       182 ~~~~~ls~re~~v  194 (195)
+T 5XHX_B          182 EEAKPIAAAEVEV  194 (195)
+T ss_dssp             -------------
+T ss_pred             hhccccchhhhcc
+Confidence            4567899999874
+
+
+No 30
+>3TRT_B Vimentin; cytoskeleton, intermediate filament, vimentin, alpha-helix; HET: GOL, SO4, MSE; 2.3A {Homo sapiens}
+Probab=26.04  E-value=58  Score=16.91  Aligned_cols=23  Identities=17%  Similarity=0.322  Sum_probs=14.9  Template_Neff=9.400
+
+Q 1G1J_1            5 MDRVVKEMRRQLEMIDKLTTREI   27 (43)
+Q Consensus         5 mdrivkEmrrqlemIdkLTTREi   27 (43)
+                      +..++++||.|-+-+-.-+..|.
+T Consensus         7 l~~~l~eir~qye~~~~~~r~e~   29 (77)
+T 3TRT_B            7 CTAAMRDVRQQYESVAAKNLQEA   29 (77)
+T ss_dssp             SHHHHHHHHHHHHHHHHHHHHHH
+T ss_pred             HHHHHHHHHHHHHHHHHHHHHHH
+Confidence            55678888888776555444444
+
+
+No 31
+>2PAG_A Hypothetical protein; NYSGX, target 10412i, novel fold; 1.6A {Pseudomonas syringae pv. tomato} SCOP: d.369.1.1
+Probab=25.78  E-value=59  Score=18.09  Aligned_cols=27  Identities=15%  Similarity=0.407  Sum_probs=15.2  Template_Neff=10.200
+
+Q 1G1J_1            5 MDRVVKEMRRQLE----MIDKLTTREIEQVE   31 (43)
+Q Consensus         5 mdrivkEmrrqle----mIdkLTTREieQvE   31 (43)
+                      |+.+++.+++.-.    .+...|.-+++++|
+T Consensus         1 ~~~i~~~l~~~~~~~~~~~~~~~~~~i~~~E   31 (135)
+T 2PAG_A            1 LEEVIEQLREANEPVPVPLELPDEDQLVEIE   31 (135)
+T ss_dssp             CHHHHHHHHHHCCCCSSCCCCCCHHHHHHHH
+T ss_pred             CHHHHHHHHHcCCCCCCCCCCCCHHHHHHHH
+Confidence            4555666555443    35556666666655
+
+
+No 32
+>1AIE_A P53; P53 TETRAMERIZATION, OLIGOMER, DNA, TRANSCRIPTION; 1.5A {Homo sapiens} SCOP: a.53.1.1
+Probab=25.67  E-value=60  Score=16.60  Aligned_cols=20  Identities=25%  Similarity=0.488  Sum_probs=13.7  Template_Neff=5.100
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |.-|.++--|.|++|.|.|.
+T Consensus         5 L~Vrgre~ye~l~ki~e~LE   24 (31)
+T 1AIE_A            5 LQIRGRERFEMFRELNEALE   24 (31)
+T ss_dssp             CCCCSHHHHHHHHHHHHHHH
+T ss_pred             eeccchhhHHHHHHHHHHHH
+Confidence            44556677778888877764
+
+
+No 33
+>3KL4_A Signal recognition 54 kDa protein; signal recognition particle, SRP, SRP54; 3.5A {Sulfolobus solfataricus}
+Probab=25.21  E-value=62  Score=22.76  Aligned_cols=26  Identities=23%  Similarity=0.466  Sum_probs=22.8  Template_Neff=8.900
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELL   33 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELL   33 (43)
+                      --+++++..-+|+.+|+.|++..+++
+T Consensus       371 ~~~~~~~~~~ii~sMt~~E~~~p~~~  396 (433)
+T 3KL4_A          371 GEEKIRRWLAALNSMTYKELENPNII  396 (433)
+T ss_pred             hHHHHHHHHHHHhcCCHHHHhCchhc
+Confidence            34678888999999999999999987
+
+
+No 34
+>3KFU_G Non-discriminating and archaeal-type aspartyl-tRNA synthetase; AspRS, GatCAB, ATP-binding, Aminoacyl-tRNA synthetase; 3.0A {Thermus thermophilus}
+Probab=25.11  E-value=62  Score=18.40  Aligned_cols=29  Identities=21%  Similarity=0.402  Sum_probs=19.8  Template_Neff=8.000
+
+Q 1G1J_1            3 KQMDRVVKEMRRQLEMIDKLTTREIEQVE   31 (43)
+Q Consensus         3 kqmdrivkEmrrqlemIdkLTTREieQvE   31 (43)
+                      .+.+.+.+++...++.+++|..=+.+-++
+T Consensus        25 ee~~~~~~~l~~il~~~~~l~~vd~~~v~   53 (92)
+T 3KFU_G           25 EEEALLLQDLKRILDFVDALPRVEEGGAE   53 (92)
+T ss_dssp             HHHHHHHHHHHHHHHHHHTCCCCCCCCCC
+T ss_pred             HHHHHHHHHHHHHHHHHHHhhcCCCCCcc
+Confidence            45667788888888888877655444443
+
+
+No 35
+>3KFU_J Non-discriminating and archaeal-type aspartyl-tRNA synthetase; AspRS, GatCAB, ATP-binding, Aminoacyl-tRNA synthetase; HET: PSU, 5MU, H2U; 3.0A {Thermus thermophilus}
+Probab=25.11  E-value=62  Score=18.40  Aligned_cols=29  Identities=21%  Similarity=0.402  Sum_probs=18.5  Template_Neff=8.000
+
+Q 1G1J_1            3 KQMDRVVKEMRRQLEMIDKLTTREIEQVE   31 (43)
+Q Consensus         3 kqmdrivkEmrrqlemIdkLTTREieQvE   31 (43)
+                      .+.+.+.+++...++.+++|..=+.+-++
+T Consensus        25 ee~~~~~~~l~~il~~~~~l~~vd~~~v~   53 (92)
+T 3KFU_J           25 EEEALLLQDLKRILDFVDALPRVEEGGAE   53 (92)
+T ss_dssp             HHHHHHHHHHHHHHHHHHTCCCCCC---C
+T ss_pred             HHHHHHHHHHHHHHHHHHHhhcCCCCCcc
+Confidence            45667788888888888877655444443
+
+
+No 36
+>2XXA_C SIGNAL RECOGNITION PARTICLE PROTEIN (E.C.3.6.5.4); PROTEIN TRANSPORT, RNA/RNA BINDING PROTEIN; HET: GCP; 3.94A {ESCHERICHIA COLI K-12}
+Probab=25.00  E-value=63  Score=22.73  Aligned_cols=26  Identities=23%  Similarity=0.303  Sum_probs=22.9  Template_Neff=8.900
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELL   33 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELL   33 (43)
+                      --++|++..-+|+.+|..|++..+++
+T Consensus       369 ~~~~~~~~~~ii~sMt~~E~~~p~~~  394 (433)
+T 2XXA_C          369 DDKVLVRMEAIINSMTMKERAKPEII  394 (433)
+T ss_dssp             CHHHHHHHHHHHHHSCHHHHHCGGGC
+T ss_pred             CHHHHHHHHHHHHhCCHHHHhChhhc
+Confidence            34678899999999999999999988
+
+
+No 37
+>3ZY1_A TUMOR PROTEIN 63; TRANSCRIPTION, TRANSCRIPTION FACTOR, TETRAMERIZATION DOMAIN; 2.15A {HOMO SAPIENS}
+Probab=24.72  E-value=64  Score=17.39  Aligned_cols=20  Identities=35%  Similarity=0.463  Sum_probs=14.1  Template_Neff=5.900
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |+-|-++--|.|+.|.|.|.
+T Consensus         8 L~VrGre~yeml~ki~e~LE   27 (46)
+T 3ZY1_A            8 LPVRGRETYEMLLKIKESLE   27 (46)
+T ss_dssp             CCCSSHHHHHHHHHHHHHHH
+T ss_pred             ecccChHhHHHHHHHHHHHH
+Confidence            45566667788888887764
+
+
+No 38
+>6JWP_C GTP-binding protein GTR1, GTP-binding protein; EGOC, roadblock domain, Gtr1, TORC1; HET: GNP; 3.2A {Saccharomyces cerevisiae S288c}
+Probab=24.34  E-value=66  Score=21.96  Aligned_cols=31  Identities=35%  Similarity=0.400  Sum_probs=21.9  Template_Neff=3.400
+
+Q 1G1J_1           11 EMRRQL-EMIDKLTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        11 Emrrql-emIdkLTTREieQvELLkri~d~l~   41 (43)
+                      +|+|++ |-..++-.|+.|--+......|+|+
+T Consensus        10 ~mqr~~~e~~~k~~~r~~el~~iv~~~nd~li   41 (129)
+T 6JWP_C           10 QMRLKEHEHEQKLLAREQELRDIVANTNDKLI   41 (129)
+T ss_dssp             --CHHHHHHHHHHHHHHHHHHHHHHHHHHHCC
+T ss_pred             HHHHHHHHHHHHHHHHHHHHHHHHHHccccee
+Confidence            455555 4567788888888888888888876
+
+
+No 39
+>2IY3_A SIGNAL RECOGNITION PARTICLE PROTEIN FFH; RNA-BINDING, RNA-BINDING PROTEIN COMPLEX, SIGNAL; 16.0A {THERMUS AQUATICUS, SULFOLOBUS SOLFATARICUS} SCOP: a.24.13.1, c.37.1.10
+Probab=23.77  E-value=68  Score=22.54  Aligned_cols=27  Identities=22%  Similarity=0.455  Sum_probs=23.3  Template_Neff=8.900
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELLK   34 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELLk   34 (43)
+                      --+++++..-+|+.+|+.|++..++++
+T Consensus       370 ~~~~~~~~~~ii~sMt~~Er~~p~~~~  396 (432)
+T 2IY3_A          370 GEEKIRRWLAALNSMTYKELENPNIID  396 (432)
+T ss_pred             cHHHHHHHHHHHhcCCHHHHhChhhcC
+Confidence            346788889999999999999999884
+
+
+No 40
+>2WQJ_C TUMOR PROTEIN P73; P73, P63, P53, TUMOR SUPPRESSION; 2.0A {HOMO SAPIENS}
+Probab=23.41  E-value=70  Score=16.65  Aligned_cols=20  Identities=30%  Similarity=0.484  Sum_probs=13.7  Template_Neff=5.300
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |+-|-++--|.|++|.+.|.
+T Consensus         9 L~vrgre~ye~l~ki~e~LE   28 (35)
+T 2WQJ_C            9 LQVRGRENFEILMKLKESLE   28 (35)
+T ss_dssp             EEEESHHHHHHHHHHHHHHH
+T ss_pred             EeecChHhHHHHHHHHHHHH
+Confidence            45566667778888877664
+
+
+No 41
+>2WQJ_G TUMOR PROTEIN P73; P73, P63, P53, TUMOR SUPPRESSION; 2.0A {HOMO SAPIENS}
+Probab=23.41  E-value=70  Score=16.65  Aligned_cols=20  Identities=30%  Similarity=0.484  Sum_probs=13.7  Template_Neff=5.300
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |+-|-++--|.|++|.+.|.
+T Consensus         9 L~vrgre~ye~l~ki~e~LE   28 (35)
+T 2WQJ_G            9 LQVRGRENFEILMKLKESLE   28 (35)
+T ss_dssp             EEEESHHHHHHHHHHHHHHH
+T ss_pred             EeecChhhHHHHHHHHHHHH
+Confidence            45566667778888877664
+
+
+No 42
+>2MW4_A Transcription factor protein; Ciona intestinalis, p53/p73-b, transcription factor; NMR {Ciona intestinalis}
+Probab=23.15  E-value=72  Score=17.33  Aligned_cols=20  Identities=25%  Similarity=0.303  Sum_probs=14.3  Template_Neff=5.800
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |+-|-++--|.|+.|.|.|.
+T Consensus         9 L~VrGre~ye~l~ki~e~LE   28 (47)
+T 2MW4_A            9 LNIRGKRKFEKVKEYKEALD   28 (47)
+T ss_dssp             EEEESHHHHHHHHHHHHHHH
+T ss_pred             EeecchhhhHHHHHHHHHHH
+Confidence            55566677788888887764
+
+
+No 43
+>5GAD_i 50S ribosomal protein L2, 50S; ribosome nascent chain, srp, sr; HET: MG, GNP; 3.7A {Escherichia coli}
+Probab=22.05  E-value=78  Score=22.63  Aligned_cols=26  Identities=23%  Similarity=0.303  Sum_probs=23.2  Template_Neff=8.600
+
+Q 1G1J_1            8 VVKEMRRQLEMIDKLTTREIEQVELL   33 (43)
+Q Consensus         8 ivkEmrrqlemIdkLTTREieQvELL   33 (43)
+                      --++|++-..+|+.+|+.|++..+++
+T Consensus       366 ~~~~~~~~~~ii~sMt~~Er~~p~~~  391 (450)
+T 5GAD_i          366 DDKVLVRMEAIINSMTMKERAKPEII  391 (450)
+T ss_pred             hHHHHHHHHHHHhcCCHHHHhCchhc
+Confidence            44678899999999999999999988
+
+
+No 44
+>4D1L_E CELLULAR TUMOR ANTIGEN P53; TRANSCRIPTION, P53 FAMILY, TUMOR SUPPRESSOR; 1.97A {DANIO RERIO}
+Probab=21.89  E-value=79  Score=17.35  Aligned_cols=20  Identities=40%  Similarity=0.599  Sum_probs=13.3  Template_Neff=5.600
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |+-|-++--|.|+.|.|.|.
+T Consensus         9 L~VrGre~yeml~ki~e~LE   28 (48)
+T 4D1L_E            9 LQVRGRERYEILKKLNDSLE   28 (48)
+T ss_dssp             EEEESHHHHHHHHHHHHHHH
+T ss_pred             eeccChhhHHHHHHHHHHHh
+Confidence            44556666777777777664
+
+
+No 45
+>4D1M_E CELLULAR TUMOR ANTIGEN P53; TRANSCRIPTION, P53 FAMILY, TUMOR SUPPRESSOR; 2.2A {DANIO RERIO}
+Probab=21.89  E-value=79  Score=17.35  Aligned_cols=20  Identities=40%  Similarity=0.599  Sum_probs=13.3  Template_Neff=5.600
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |+-|-++--|.|+.|.|.|.
+T Consensus         9 L~VrGre~yeml~ki~e~LE   28 (48)
+T 4D1M_E            9 LQVRGRERYEILKKLNDSLE   28 (48)
+T ss_dssp             EEEESHHHHHHHHHHHHHHH
+T ss_pred             eeccChhhHHHHHHHHHHHh
+Confidence            44556666777777777664
+
+
+No 46
+>1QZW_G Signal recognition 54 kDa PROTEIN/RNA; Signal recognition particle, SRP, ribonucleoprotein; HET: CCC, GTP; 4.1A {Sulfolobus solfataricus} SCOP: a.24.13.1, c.37.1.10, a.36.1.1
+Probab=21.83  E-value=79  Score=22.38  Aligned_cols=28  Identities=21%  Similarity=0.411  Sum_probs=23.6  Template_Neff=8.800
+
+Q 1G1J_1            7 RVVKEMRRQLEMIDKLTTREIEQVELLK   34 (43)
+Q Consensus         7 rivkEmrrqlemIdkLTTREieQvELLk   34 (43)
+                      .--++|++..-+|+.+|+.|++..++++
+T Consensus       377 ~~~~~~~~~~~ii~sMt~~E~~~p~~~~  404 (440)
+T 1QZW_G          377 IGEEKIRRWLAALNSMTYKELENPNIID  404 (440)
+T ss_dssp             CCTTTHHHHTTTTTTSCTGGGGSCSCCC
+T ss_pred             cCHHHHHHHHHHHHcCCHHHHhCccccC
+Confidence            3456788888999999999999988873
+
+
+No 47
+>5HOB_C Tumor protein p73; transcription factor, tetramerization domain, p73; 1.22001298703A {Homo sapiens}
+Probab=21.29  E-value=83  Score=17.29  Aligned_cols=20  Identities=25%  Similarity=0.356  Sum_probs=13.2  Template_Neff=5.800
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |+-|-++--|.|+.|.|.|.
+T Consensus         9 L~VrGre~ye~l~ki~e~LE   28 (50)
+T 5HOB_C            9 LQVRGRKNFEILMELKRSLE   28 (50)
+T ss_dssp             EEEESHHHHHHHHHHHHHHH
+T ss_pred             EeecChhhHHHHHHHHHHHH
+Confidence            45556666777777777664
+
+
+No 48
+>1SAK_A TUMOR SUPPRESSOR P53; ANTI-ONCOGENE; NMR {Homo sapiens} SCOP: a.53.1.1
+Probab=20.53  E-value=88  Score=17.05  Aligned_cols=20  Identities=25%  Similarity=0.488  Sum_probs=14.4  Template_Neff=5.000
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |.-|-++--+.|+.|.|.|-
+T Consensus        12 L~Vrgre~ye~l~ki~e~LE   31 (42)
+T 1SAK_A           12 LQIRGRERFEMFRELNEALE   31 (42)
+T ss_dssp             EEEESHHHHHHHHHHHHHHH
+T ss_pred             EeccchhhHHHHHHHHHHHH
+Confidence            45566677788888887764
+
+
+No 49
+>2NB1_B Tumor protein 63, Tumor protein; p63, p73, tetramerization domain, hetero; NMR {Homo sapiens}
+Probab=20.52  E-value=88  Score=17.19  Aligned_cols=20  Identities=25%  Similarity=0.444  Sum_probs=13.2  Template_Neff=5.800
+
+Q 1G1J_1           22 LTTREIEQVELLKRIYDKLT   41 (43)
+Q Consensus        22 LTTREieQvELLkri~d~l~   41 (43)
+                      |+-|-++--|.|+.|.|.|.
+T Consensus         9 L~VrGre~yeml~ki~e~LE   28 (50)
+T 2NB1_B            9 LQVRGRKNFEILMKLKESLE   28 (50)
+T ss_dssp             EEECCHHHHHHHHHHHHHHH
+T ss_pred             EeecChhhHHHHHHHHHHHH
+Confidence            44556666777777777664
+
+

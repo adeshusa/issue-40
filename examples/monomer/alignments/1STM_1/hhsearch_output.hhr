@@ -1,0 +1,188 @@
+Query         1STM_1 
+Match_columns 157
+No_of_seqs    6 out of 9
+Neff          2.53507
+Searched_HMMs 80799
+Date          Mon Mar 17 17:25:34 2025
+Command       /u/thayes/anaconda3/envs/openfold_env/bin/hhsearch -i /tmp/tmpzi2d1xvh/query.a3m -o /u/thayes/vizfold/output_dirs/my_outputs_align_1STM/alignments/1STM_1/hhsearch_output.hhr -maxseq 1000000 -cpu 2 -d /ime/hdd/rhaas/SUP-5301/database/pdb70/pdb70 
+
+ No Hit                             Prob E-value P-value  Score    SS Cols Query HMM  Template HMM
+  1 1STM_A SATELLITE PANICUM MOSAI 100.0 3.4E-72 4.2E-77  446.9   0.0  157    1-157     1-157 (157)
+  2 5CW0_A Coat protein; capsid pr 100.0 3.4E-72 4.2E-77  446.9   0.0  157    1-157     1-157 (157)
+  3 5CVZ_A Coat protein; capsid pr 100.0 1.3E-65 1.6E-70  404.0   0.0  140   18-157     2-141 (141)
+  4 2OLG_A Pro-phenoloxidase activ  17.4 1.1E+02  0.0014   23.5   0.0   52   41-92      5-58  (278)
+  5 4WN0_A Xenopus embryonic epide  14.0 1.6E+02   0.002   26.4   0.0   35   67-101   207-241 (289)
+  6 5ZC0_A Xenopus Embryonic Epide  14.0 1.6E+02   0.002   26.4   0.0   35   67-101   207-241 (289)
+  7 4J7G_A EvaA 2,3-dehydratase; N  11.0 2.2E+02  0.0028   28.2   0.0   44   30-74    279-328 (471)
+  8 4J7H_B PCZA361.3; Nudix hydrol  11.0 2.2E+02  0.0028   28.2   0.0   44   30-74    279-328 (471)
+  9 3J7P_S PROTEIN/RNA Complex; ma  10.8 2.3E+02  0.0029   25.8   0.0   56   21-80     28-84  (224)
+ 10 3J7R_S PROTEIN/RNA Complex; ma  10.8 2.3E+02  0.0029   25.8   0.0   56   21-80     28-84  (224)
+
+No 1
+>1STM_A SATELLITE PANICUM MOSAIC VIRUS; VIRUS, Icosahedral virus; 1.9A {Panicum mosaic satellite virus} SCOP: b.121.7.1
+Probab=100.00  E-value=3.4e-72  Score=446.86  Aligned_cols=157  Identities=100%  Similarity=1.410  Sum_probs=140.2  Template_Neff=2.200
+
+Q 1STM_1            1 MAPKRSRRSNRRAGSRAAATSLVYDTCYVTLTERATTSFQRQSFPTLKGMGDRAFQVVAFTIQGVSAAPLMYNARLYNPG   80 (157)
+Q Consensus         1 ~~~rr~rRr~RR~~~R~~~~~ai~d~~Y~T~~~gstTt~~Rk~F~iLag~GDRsFkvvgl~iqvsSs~P~lvQ~~~ynP~   80 (157)
+                      |+|||+||++||+++|++++++|+|+||||+++|+||+|+||+||||||||||||||||++|||+|++|||||+|||||+
+T Consensus         1 ~~~rrs~r~~rra~~~~~~~s~~~d~~y~Tv~~~stta~~Rk~fp~L~~mGDR~Fqvv~~~iq~sS~~P~l~q~rlynp~   80 (157)
+T 1STM_A            1 MAPKRSRRSNRRAGSRAAATSLVYDTCYVTLTERATTSFQRQSFPTLKGMGDRAFQVVAFTIQGVSAAPLMYNARLYNPG   80 (157)
+T ss_dssp             ----------------CCCCEEEEEEEEECCCTTCEEEEEGGGSHHHHHSCSCCEEEEEEEEEEEESSCEEEEEEECCTT
+T ss_pred             CCCccccccchhhcchHhhHHhceEEEEEEeccccceehhhcccHhhcccCCcceeEEEEEEEeecccceEEEEEEcCCC
+Confidence            79999999999999999999999999999999999999999999999999999999999999999999999999999999
+
+
+Q 1STM_1           81 DTDSVHATGVQLMGTVPRTVRLTPRVGQNNWFFGNTEEAETILAIDGLVSTKGANAPSNTVIVTGCFRLAPSELQSS  157 (157)
+Q Consensus        81 ~~d~i~~~g~~~~g~~pr~~~LR~~~~~~~W~~GnT~~s~tlvaiD~L~t~~~~~t~~~t~lv~~~fRl~~~ELqs~  157 (157)
+                      ++||++|+|+||+|++|||+|||+|+++|+||+|||++++|||+||+|+|||++++++++|+|++||||+||||||+
+T Consensus        81 ~~d~v~stgl~m~G~~pr~~rLr~~~~~~~Wf~GnT~~sqtlvaID~l~t~k~~~t~~~~~~v~i~~rlapsElqs~  157 (157)
+T 1STM_A           81 DTDSVHATGVQLMGTVPRTVRLTPRVGQNNWFFGNTEEAETILAIDGLVSTKGANAPSNTVIVTGCFRLAPSELQSS  157 (157)
+T ss_dssp             CSSCSEECCCEEECSSCEEEEECCCTTSCCCBCTTCCTTCEEEEEEEECSSTTCCCCSEEEEEEEEEEECCCCCCCC
+T ss_pred             CCccccccceeEecccCcEEEcccCCCCCCccCCCCCCceEEEEEeeeeecCCCCCCCceEEEEEEEEeCchHHhcC
+Confidence            99999999999999999999999999999999999999999999999999999999999999999999999999985
+
+
+No 2
+>5CW0_A Coat protein; capsid protein, satellite virus, VIRUS; 4.6A {Satellite panicum mosaic virus}
+Probab=100.00  E-value=3.4e-72  Score=446.86  Aligned_cols=157  Identities=100%  Similarity=1.410  Sum_probs=140.2  Template_Neff=2.200
+
+Q 1STM_1            1 MAPKRSRRSNRRAGSRAAATSLVYDTCYVTLTERATTSFQRQSFPTLKGMGDRAFQVVAFTIQGVSAAPLMYNARLYNPG   80 (157)
+Q Consensus         1 ~~~rr~rRr~RR~~~R~~~~~ai~d~~Y~T~~~gstTt~~Rk~F~iLag~GDRsFkvvgl~iqvsSs~P~lvQ~~~ynP~   80 (157)
+                      |+|||+||++||+++|++++++|+|+||||+++|+||+|+||+||||||||||||||||++|||+|++|||||+|||||+
+T Consensus         1 ~~~rrs~r~~rra~~~~~~~s~~~d~~y~Tv~~~stta~~Rk~fp~L~~mGDR~Fqvv~~~iq~sS~~P~l~q~rlynp~   80 (157)
+T 5CW0_A            1 MAPKRSRRSNRRAGSRAAATSLVYDTCYVTLTERATTSFQRQSFPTLKGMGDRAFQVVAFTIQGVSAAPLMYNARLYNPG   80 (157)
+T ss_dssp             ----------------CCCCCEEEEEEEECCCSSCEEEEEGGGSHHHHHHSSCEEEEEEEEEEEEESSSCEEEEEECCTT
+T ss_pred             CCCccccccchhhcchHhhHHhceEEEEEEeccccceehhhcccHhhcccCCcceeEEEEEEEeecccceEEEEEEcCCC
+Confidence            79999999999999999999999999999999999999999999999999999999999999999999999999999999
+
+
+Q 1STM_1           81 DTDSVHATGVQLMGTVPRTVRLTPRVGQNNWFFGNTEEAETILAIDGLVSTKGANAPSNTVIVTGCFRLAPSELQSS  157 (157)
+Q Consensus        81 ~~d~i~~~g~~~~g~~pr~~~LR~~~~~~~W~~GnT~~s~tlvaiD~L~t~~~~~t~~~t~lv~~~fRl~~~ELqs~  157 (157)
+                      ++||++|+|+||+|++|||+|||+|+++|+||+|||++++|||+||+|+|||++++++++|+|++||||+||||||+
+T Consensus        81 ~~d~v~stgl~m~G~~pr~~rLr~~~~~~~Wf~GnT~~sqtlvaID~l~t~k~~~t~~~~~~v~i~~rlapsElqs~  157 (157)
+T 5CW0_A           81 DTDSVHATGVQLMGTVPRTVRLTPRVGQNNWFFGNTEEAETILAIDGLVSTKGANAPSNTVIVTGCFRLAPSELQSS  157 (157)
+T ss_dssp             CSSCCEECCCBCCCSSCEEECCCCCTTSCCCEECSSCSCCEEEEEEEECSSTTCCCCSEEEEEEEEEEECCCCCCCC
+T ss_pred             CCccccccceeEecccCcEEEcccCCCCCCccCCCCCCceEEEEEeeeeecCCCCCCCceEEEEEEEEeCchHHhcC
+Confidence            99999999999999999999999999999999999999999999999999999999999999999999999999985
+
+
+No 3
+>5CVZ_A Coat protein; capsid protein, satellite virus, glutaraldehyde; 3.3A {Panicum mosaic satellite virus}
+Probab=100.00  E-value=1.3e-65  Score=404.00  Aligned_cols=140  Identities=100%  Similarity=1.421  Sum_probs=138.0  Template_Neff=2.300
+
+Q 1STM_1           18 AATSLVYDTCYVTLTERATTSFQRQSFPTLKGMGDRAFQVVAFTIQGVSAAPLMYNARLYNPGDTDSVHATGVQLMGTVP   97 (157)
+Q Consensus        18 ~~~~ai~d~~Y~T~~~gstTt~~Rk~F~iLag~GDRsFkvvgl~iqvsSs~P~lvQ~~~ynP~~~d~i~~~g~~~~g~~p   97 (157)
+                      +++++|+|+||||+++|+||+|+||+||||||||||||||||++|||+|++|||||+|||||+++||++|+|+||+|++|
+T Consensus         2 ~~~s~~~d~~y~Tv~~~stta~~Rk~fp~L~~mGDR~Fqvv~~~iq~sS~~P~l~q~r~y~p~~~d~v~~tgl~~~G~~p   81 (141)
+T 5CVZ_A            2 AATSLVYDTCYVTLTERATTSFQRQSFPTLKGMGDRAFQVVAFTIQGVSAAPLMYNARLYNPGDTDSVHATGVQLMGTVP   81 (141)
+T ss_dssp             CCCEEEEEEEEECCCTTCEEEEEGGGSHHHHHSCSCCEEEEEEEEEEEESSSCEEEEEEECTTCSSEEEECCCEECCSSC
+T ss_pred             cchhheeEEEEEEeccccceechhcccHhhcccCCcceeEEEEEEEeecccceEEEEEEcCCCCCccccccceEEecccC
+Confidence            56899999999999999999999999999999999999999999999999999999999999999999999999999999
+
+
+Q 1STM_1           98 RTVRLTPRVGQNNWFFGNTEEAETILAIDGLVSTKGANAPSNTVIVTGCFRLAPSELQSS  157 (157)
+Q Consensus        98 r~~~LR~~~~~~~W~~GnT~~s~tlvaiD~L~t~~~~~t~~~t~lv~~~fRl~~~ELqs~  157 (157)
+                      ||+|||+|+|+|+||+|||++++|||+||+|+|||++++++++|+|++||||+||||||+
+T Consensus        82 r~~rlr~~~~~~~Wf~GnT~~sqtlvaID~l~t~k~~~t~~~~~~v~i~~rlapsElqs~  141 (141)
+T 5CVZ_A           82 RTVRLTPRVGQNNWFFGNTEEAETILAIDGLVSTKGANAPSNTVIVTGCFRLAPSELQSS  141 (141)
+T ss_dssp             EEEEECCCTTSCCCBCTTCCTTCEEEEEEEECSSTTCCCCSEEEEEEEEEEECCCCCCCC
+T ss_pred             cEEEcccCCCCCCccCCCCCCceEEEEEeeeeecCCCCCCCceEEEEEEEEeCchHHhcC
+Confidence            999999999999999999999999999999999999999999999999999999999985
+
+
+No 4
+>2OLG_A Pro-phenoloxidase activating enzyme-I; prophenoloxidase activating factor-I, PPAF-I, serine; HET: NAG; 1.7A {Holotrichia diomphalia}
+Probab=17.41  E-value=1.1e+02  Score=23.48  Aligned_cols=52  Identities=10%  Similarity=-0.006  Sum_probs=31.8  Template_Neff=11.500
+
+Q 1STM_1           41 RQSFPTLKGMGDRA--FQVVAFTIQGVSAAPLMYNARLYNPGDTDSVHATGVQL   92 (157)
+Q Consensus        41 Rk~F~iLag~GDRs--Fkvvgl~iqvsSs~P~lvQ~~~ynP~~~d~i~~~g~~~   92 (157)
+                      +.+-+.+..||-..  +++++=+-......|.++.+....+.......|+|+.+
+T Consensus         5 ~~~~~~~~~cg~~~~~~~~~~g~~~~~~~~P~~~~~~~~~~~~~~~~~C~g~li   58 (278)
+T 2OLG_A            5 RRPELLPNDCGYQVEADKILNGDDTVPEEFPWTAMIGYKNSSNFEQFACGGSLI   58 (278)
+T ss_dssp             CCGGGSCSSCSCCCCCCCSCCSSBCCTTSSTTEEEEEEECTTCCEEEEEEEEEC
+T ss_pred             CCcccCCCCCCccccccceeCCeeCCCccCCcEEEEEeeCCCCceEEEEEEEEe
+Confidence            44556777787543  45555554445577888887765544444566777654
+
+
+No 5
+>4WN0_A Xenopus embryonic epidermal lectin; lectin, carbohydrate-binding protein, calcium, trimer; HET: G3P, 1PE; 2.2A {Xenopus laevis}
+Probab=14.02  E-value=1.6e+02  Score=26.38  Aligned_cols=35  Identities=17%  Similarity=0.132  Sum_probs=29.7  Template_Neff=7.100
+
+Q 1STM_1           67 AAPLMYNARLYNPGDTDSVHATGVQLMGTVPRTVR  101 (157)
+Q Consensus        67 s~P~lvQ~~~ynP~~~d~i~~~g~~~~g~~pr~~~  101 (157)
+                      -+|=.||+|++|.+..-.+.|.|+...|-++-.+-
+T Consensus       207 ~~~g~~~fr~~~~~~~~~a~c~g~~~~~~~~~~~c  241 (289)
+T 4WN0_A          207 FTPGFVQFRAVNSERATLALCAGVKVKGCNVEHHC  241 (289)
+T ss_dssp             EEEEEEEEEEECTTSCEEEEEEEEEECSSCGGGTC
+T ss_pred             ccCcEEEEEEcCCccceeeecceeeecCCCCccee
+Confidence            57889999999999999999999998777654444
+
+
+No 6
+>5ZC0_A Xenopus Embryonic Epidermal Lectin; carbohydrate binding protein, lectin, intelectin; HET: CA, SM; 2.75A {Xenopus laevis}
+Probab=14.02  E-value=1.6e+02  Score=26.38  Aligned_cols=35  Identities=17%  Similarity=0.132  Sum_probs=29.7  Template_Neff=7.100
+
+Q 1STM_1           67 AAPLMYNARLYNPGDTDSVHATGVQLMGTVPRTVR  101 (157)
+Q Consensus        67 s~P~lvQ~~~ynP~~~d~i~~~g~~~~g~~pr~~~  101 (157)
+                      -+|=.||+|++|.+..-.+.|.|+...|-++-.+-
+T Consensus       207 ~~~g~~~fr~~~~~~~~~a~c~g~~~~~~~~~~~c  241 (289)
+T 5ZC0_A          207 FTPGFVQFRAVNSERATLALCAGVKVKGCNVEHHC  241 (289)
+T ss_dssp             EEEEEEEEEEECTTSCEEEEEEEEEECSSCGGGTC
+T ss_pred             ccCcEEEEEEcCCccceeeecceeeecCCCCccee
+Confidence            57889999999999999999999998777654444
+
+
+No 7
+>4J7G_A EvaA 2,3-dehydratase; Nudix hydrolase superfamily, dehydration, BIOSYNTHETIC; HET: TRH, 1JB; 1.7A {Amycolatopsis orientalis}
+Probab=11.00  E-value=2.2e+02  Score=28.17  Aligned_cols=44  Identities=18%  Similarity=0.376  Sum_probs=33.1  Template_Neff=5.400
+
+Q 1STM_1           30 TLTERATTSFQRQSFPTLKGMGDRAFQVVAFTIQGV-----S-AAPLMYNA   74 (157)
+Q Consensus        30 T~~~gstTt~~Rk~F~iLag~GDRsFkvvgl~iqvs-----S-s~P~lvQ~   74 (157)
+                      ..+......|.+++ ..+..-.+|-|+|+|+.++..     + ..|+|.|.
+T Consensus       279 ~iPL~~l~~W~~~~-~~i~H~~grfF~V~gv~V~~~~REV~~W~QPli~~~  328 (471)
+T 4J7G_A          279 RIPLADVCGWKQGA-EEIEHEDGRYFKVLAVAVKGSNREKISWTQPLVESV  328 (471)
+T ss_dssp             EECGGGCSSEEECS-SCEEETTSCSEEEEEEEEECC----CEEEEEEEEES
+T ss_pred             EEcHHHcCCcEecC-CeEEcCCCCeEEEEEEEEEcCCCCceeeeccEEEcC
+Confidence            34445556788887 567788889999999999864     3 77888775
+
+
+No 8
+>4J7H_B PCZA361.3; Nudix hydrolase superfamily, dehydration, BIOSYNTHETIC; HET: TLO, TRH, EDO; 1.69A {Amycolatopsis orientalis}
+Probab=11.00  E-value=2.2e+02  Score=28.17  Aligned_cols=44  Identities=18%  Similarity=0.376  Sum_probs=32.7  Template_Neff=5.400
+
+Q 1STM_1           30 TLTERATTSFQRQSFPTLKGMGDRAFQVVAFTIQGV-----S-AAPLMYNA   74 (157)
+Q Consensus        30 T~~~gstTt~~Rk~F~iLag~GDRsFkvvgl~iqvs-----S-s~P~lvQ~   74 (157)
+                      ..+......|.+++ ..+..-.+|-|+|+|+.++..     + ..|+|.|.
+T Consensus       279 ~iPL~~l~~W~~~~-~~i~H~~grfF~V~gv~V~~~~REV~~W~QPli~~~  328 (471)
+T 4J7H_B          279 RIPLADVCGWKQGA-EEIEHEDGRYFKVLAVAVKGSNREKISWTQPLVESV  328 (471)
+T ss_dssp             EECGGGCTTEEECS-SCEEETTSCSEEEEEEEEECC------EEEEEEEES
+T ss_pred             EEcHHHcCCcEecC-CeEEcCCCCeEEEEEEEEEcCCCCceeeeccEEEcC
+Confidence            34445556788887 567788889999999999864     3 77888775
+
+
+No 9
+>3J7P_S PROTEIN/RNA Complex; mammalian, Sec61, translocation, translation, eEF2; HET: MG; 3.5A {Sus scrofa}
+Probab=10.79  E-value=2.3e+02  Score=25.81  Aligned_cols=56  Identities=14%  Similarity=0.229  Sum_probs=43.0  Template_Neff=4.500
+
+Q 1STM_1           21 SLVYDTCYVTLTERATTSFQRQSFPTLKGMGDRAFQVVAFTIQGV-SAAPLMYNARLYNPG   80 (157)
+Q Consensus        21 ~ai~d~~Y~T~~~gstTt~~Rk~F~iLag~GDRsFkvvgl~iqvs-Ss~P~lvQ~~~ynP~   80 (157)
+                      ..+..+++.+...|+-+...    ..-+.+.=+-|+|||=.+--. .+.|-||+.+||-|.
+T Consensus        28 ~~~~~~~~~~~~~~~~~~~~----~~~~~~~l~eY~VvGr~lPt~~~p~p~iyrM~IFApN   84 (224)
+T 3J7P_S           28 ERLRESGYFLSGGGGERGES----AMKASGTLREYKVVGRCLPTPKCRTPPLYRMRIFAPN   84 (224)
+T ss_pred             HHHHHhcceecCCCCcccee----eeccCCCceEEEEEEEeCCCCCCCCCCceEeeecCCC
+Confidence            45778888888877766433    333477788999999998543 389999999999887
+
+
+No 10
+>3J7R_S PROTEIN/RNA Complex; mammalian, Sec61, translocation, translation, RIBOSOME; HET: MG; 3.9A {Sus scrofa}
+Probab=10.79  E-value=2.3e+02  Score=25.81  Aligned_cols=56  Identities=14%  Similarity=0.229  Sum_probs=43.0  Template_Neff=4.500
+
+Q 1STM_1           21 SLVYDTCYVTLTERATTSFQRQSFPTLKGMGDRAFQVVAFTIQGV-SAAPLMYNARLYNPG   80 (157)
+Q Consensus        21 ~ai~d~~Y~T~~~gstTt~~Rk~F~iLag~GDRsFkvvgl~iqvs-Ss~P~lvQ~~~ynP~   80 (157)
+                      ..+..+++.+...|+-+...    ..-+.+.=+-|+|||=.+--. .+.|-||+.+||-|.
+T Consensus        28 ~~~~~~~~~~~~~~~~~~~~----~~~~~~~l~eY~VvGr~lPt~~~p~p~iyrM~IFApN   84 (224)
+T 3J7R_S           28 ERLRESGYFLSGGGGERGES----AMKASGTLREYKVVGRCLPTPKCRTPPLYRMRIFAPN   84 (224)
+T ss_pred             HHHHHhcceecCCCCcccee----eeccCCCceEEEEEEEeCCCCCCCCCCceEeeecCCC
+Confidence            45778888888877766433    333477788999999998543 389999999999887
+
+
