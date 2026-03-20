@@ -48,7 +48,7 @@ def store_layer_activation(path, layer_index, activation_array):
     -------
     None
     """
-    # Basic input checks for this method's scope only.
+
     if not isinstance(layer_index, int):
         raise TypeError("layer_index must be an integer")
 
@@ -60,12 +60,11 @@ def store_layer_activation(path, layer_index, activation_array):
 
     tokens, hidden_dim = activation_array.shape
 
-    # Ensure archive structure: layers/{layer_index}/
     root = zarr.open_group(path, mode="a")
     layers_group = root.require_group("layers")
     layer_group = layers_group.require_group(str(layer_index))
 
-    # Incremental behavior:
+
     # - If dataset exists, append on token axis.
     # - If missing, create it with initial data.
     if "activation" in layer_group:
@@ -85,7 +84,7 @@ def store_layer_activation(path, layer_index, activation_array):
         activation_ds.resize((old_tokens + tokens, hidden_dim))
         activation_ds[old_tokens:old_tokens + tokens, :] = activation_array
     else:
-        # Chunking is token-major so later appends and reads stay simple.
+
         token_chunk = max(1, min(tokens, 1024))
         layer_group.create_dataset(
             "activation",
@@ -134,7 +133,7 @@ def store_pair_representation(path, pair_array):
     None
     """
     pair_array = np.asarray(pair_array)
-    if pair_array.ndim != 3:
+        if pair_array.ndim != 3:
         raise ValueError(
             "pair_array must have shape (tokens, tokens, pair_dim)"
         )
@@ -148,8 +147,6 @@ def store_pair_representation(path, pair_array):
     root = zarr.open_group(path, mode="a")
     representations_group = root.require_group("representations")
 
-    # If pair already exists with matching shape, update in place.
-    # Otherwise, replace it with the new tensor.
     if "pair" in representations_group:
         pair_ds = representations_group["pair"]
         if pair_ds.shape == pair_array.shape:
