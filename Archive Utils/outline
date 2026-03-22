@@ -131,7 +131,7 @@ def tensor_to_zarr_array(path, tensor, chunks=None, overwrite=False):
     import os
     array = tensor_to_numpy(tensor)
 
-    if ":" in path:
+    if "::" in path:
         archive_path, dataset_path = path.split("::", 1)
         if not dataset_path:
             raise ValueError("Dataset path is empty. Use 'archive.zarr::group/dataset'.")
@@ -250,7 +250,21 @@ def store_pair_representation(path, pair_array):
     -------
     None
     """
-    pass
+    pair_array = tensor_to_numpy(pair_array)
+
+    if pair_array.ndim != 3:
+        raise ValueError(
+            f"Expected 3D pair array (tokens, tokens, pair_dim), "
+            f"got {pair_array.ndim}D with shape {pair_array.shape}"
+        )
+    if pair_array.shape[0] != pair_array.shape[1]:
+        raise ValueError(
+            f"Pair representation must be square in first two dims (tokens x tokens), "
+            f"got shape {pair_array.shape}"
+        )
+
+    array_path = f"{path.rstrip('/')}::representations/pair"
+    tensor_to_zarr_array(array_path, pair_array, overwrite=True)
 
 
 # ============================================================
@@ -297,11 +311,7 @@ def store_attention_heads(path, layer_index, attention_array):
     -------
     None
     """
-    # Convert to NumPy if necessary (e.g., PyTorch tensor)
-    if hasattr(attention_array, 'detach'):
-        attention_array = attention_array.detach().cpu().numpy()
-    else:
-        attention_array = np.asarray(attention_array)
+    attention_array = tensor_to_numpy(attention_array)
 
     # Validate tensor shape: (num_heads, tokens, tokens)
     if attention_array.ndim != 3:
@@ -317,16 +327,10 @@ def store_attention_heads(path, layer_index, attention_array):
             f"got shape {attention_array.shape}"
         )
 
-    # Build archive path: layers/{layer_index}/attention
-    root = zarr.open(path, mode='a')
-    layer_group = root.require_group(f"layers/{layer_index}")
+    # Use method 2: archive_path::dataset_path for in-archive storage
+    array_path = f"{path.rstrip('/')}::layers/{layer_index}/attention"
     chunks = (1, tokens_i, tokens_j)
-    if "attention" in layer_group:
-        del layer_group["attention"]
-    layer_group["attention"] = zarr.array(
-        attention_array,
-        chunks=chunks,
-    )
+    tensor_to_zarr_array(array_path, attention_array, chunks=chunks, overwrite=True)
 
 
 # ============================================================
@@ -369,11 +373,7 @@ def store_structure_coordinates(path, coordinates, residue_types=None):
     -------
     None
     """
-    # Convert to NumPy if necessary (e.g., PyTorch tensor)
-    if hasattr(coordinates, 'detach'):
-        coordinates = coordinates.detach().cpu().numpy()
-    else:
-        coordinates = np.asarray(coordinates)
+    coordinates = tensor_to_numpy(coordinates)
 
     # Validate coordinate dimensions: (num_residues, 3)
     if coordinates.ndim != 2:
@@ -388,29 +388,29 @@ def store_structure_coordinates(path, coordinates, residue_types=None):
         )
 
     num_residues = coordinates.shape[0]
+    archive_path = path.rstrip("/")
 
-    # Create structure group and store coordinates
-    root = zarr.open(path, mode='a')
-    structure_group = root.require_group("structure")
-    if "coordinates" in structure_group:
-        del structure_group["coordinates"]
-    structure_group["coordinates"] = zarr.array(coordinates)
+    # Use method 2 for in-archive storage
+    tensor_to_zarr_array(
+        f"{archive_path}::structure/coordinates",
+        coordinates,
+        overwrite=True,
+    )
 
     # Optionally store residue type information
     if residue_types is not None:
-        if hasattr(residue_types, 'detach'):
-            residue_types = residue_types.detach().cpu().numpy()
-        else:
-            residue_types = np.asarray(residue_types)
-
+        residue_types = tensor_to_numpy(residue_types)
+        residue_types = np.squeeze(residue_types)  # handle (1, N) from batched aatype
         if len(residue_types) != num_residues:
             raise ValueError(
                 f"residue_types length ({len(residue_types)}) must match "
                 f"number of residues ({num_residues})"
             )
-        if "residue_types" in structure_group:
-            del structure_group["residue_types"]
-        structure_group["residue_types"] = zarr.array(residue_types)
+        tensor_to_zarr_array(
+            f"{archive_path}::structure/residue_types",
+            residue_types,
+            overwrite=True,
+        )
 
 
 # ============================================================
