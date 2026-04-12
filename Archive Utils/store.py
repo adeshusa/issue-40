@@ -1,26 +1,69 @@
 """
-Storage helpers for VizFold archive outputs.
+Storage helpers for VizFold inference trace archives.
 
-This module currently defines scaffolding for:
-- Method 3: layer activation storage
-- Method 4: pair representation storage
+This module currently defines:
+- Method 3: single-representation layer storage
+- Method 4: pair-representation layer storage
+
+The storage layout follows the VizFold Zarr format specification:
+
+run.vizfold.zarr/
+├── metadata/
+├── representations/
+│   ├── single/
+│   │   ├── layer_00
+│   │   └── ...
+│   └── pair/
+│       ├── layer_00
+│       └── ...
+├── attention/
+│   └── triangle_start/
+└── structure/
 """
 
 import numpy as np
 import zarr
 
 STORAGE_DTYPE = np.float32
+_SINGLE_TOKEN_CHUNK = 1024
+_PAIR_TOKEN_CHUNK = 128
 
 
-def _normalize_embedding_array(array, expected_ndim, array_name):
+def _open_archive_root(path):
     """
-    Validate an embedding-like array and normalize it for storage.
+    Open (or create) a Zarr v2 archive root.
+
+    Falls back to plain open_group for older zarr versions that do not
+    accept the zarr_version keyword.
+    """
+    try:
+        return zarr.open_group(path, mode="a", zarr_version=2)
+    except TypeError:
+        return zarr.open_group(path, mode="a")
+
+
+def _ensure_archive_layout(root):
+    """
+    Ensure canonical top-level groups and required subgroups exist.
+    """
+    root.require_group("metadata")
+    representations_group = root.require_group("representations")
+    representations_group.require_group("single")
+    representations_group.require_group("pair")
+    attention_group = root.require_group("attention")
+    attention_group.require_group("triangle_start")
+    root.require_group("structure")
+
+
+def _normalize_numeric_array(array, *, array_name, min_ndim):
+    """
+    Validate and normalize an array for storage.
     """
     array = np.asarray(array)
 
-    if array.ndim != expected_ndim:
+    if array.ndim < min_ndim:
         raise ValueError(
-            f"{array_name} must have {expected_ndim} dimensions; "
+            f"{array_name} must have at least {min_ndim} dimensions; "
             f"received shape {array.shape}"
         )
 
@@ -33,7 +76,41 @@ def _normalize_embedding_array(array, expected_ndim, array_name):
             f"received dtype {array.dtype}"
         )
 
+    if any(dim <= 0 for dim in array.shape):
+        raise ValueError(
+            f"{array_name} dimensions must all be positive; "
+            f"received shape {array.shape}"
+        )
+
     return array.astype(STORAGE_DTYPE, copy=False)
+
+
+def _layer_name(layer_index):
+    """
+    Build canonical layer key names such as layer_00, layer_01, ... .
+    """
+    if not isinstance(layer_index, int):
+        raise TypeError("layer_index must be an integer")
+    if layer_index < 0:
+        raise ValueError("layer_index must be nonnegative")
+    return f"layer_{layer_index:02d}"
+
+
+def _single_chunks(shape):
+    """
+    Recommended chunking for per-residue (single) representations.
+    """
+    return (max(1, min(shape[0], _SINGLE_TOKEN_CHUNK)),) + shape[1:]
+
+
+def _pair_chunks(shape):
+    """
+    Recommended chunking for pair representations.
+    """
+    return (
+        max(1, min(shape[0], _PAIR_TOKEN_CHUNK)),
+        max(1, min(shape[1], _PAIR_TOKEN_CHUNK)),
+    ) + shape[2:]
 
 
 # ============================================================
@@ -42,27 +119,18 @@ def _normalize_embedding_array(array, expected_ndim, array_name):
 
 def store_layer_activation(path, layer_index, activation_array):
     """
-    Store a transformer layer activation inside the archive.
-
-    Layer activations represent the hidden state outputs from a
-    transformer block.
+    Store a per-layer single representation tensor.
 
     Typical shape:
-        (tokens, hidden_dimension)
+        (num_residues, channel_dim)
+    but any N-D numeric array with ndim >= 2 is accepted.
 
     Archive layout:
-        layers/{layer_index}/activation
+        representations/single/layer_XX
 
     Storage behavior:
-        Each call appends one activation matrix to the dataset,
-        so stored arrays have shape:
-        (num_writes, tokens, hidden_dimension)
-
-    Responsibilities:
-    -----------------
-    - Ensure the correct archive group exists
-    - Validate activation shape
-    - Write the activation array to the appropriate location
+        Each layer is stored as one named dataset. Writing to the same
+        layer index overwrites that layer dataset.
 
     Parameters
     ----------
@@ -70,103 +138,59 @@ def store_layer_activation(path, layer_index, activation_array):
         Root path to the Zarr archive.
 
     layer_index : int
-        Index of the transformer layer.
+        Layer index used to build the key layer_XX.
 
     activation_array : numpy.ndarray
-        Activation tensor with shape (tokens, hidden_dim).
+        Single-representation tensor for one layer.
 
     Returns
     -------
     None
     """
-
-    if not isinstance(layer_index, int):
-        raise TypeError("layer_index must be an integer")
-    if layer_index < 0:
-        raise ValueError("layer_index must be nonnegative")
-
-    activation_array = _normalize_embedding_array(
+    layer_key = _layer_name(layer_index)
+    activation_array = _normalize_numeric_array(
         activation_array,
-        expected_ndim=2,
         array_name="activation_array",
+        min_ndim=2,
     )
-    tokens, hidden_dim = activation_array.shape
 
-    root = zarr.open_group(path, mode="a")
-    layers_group = root.require_group("layers")
-    layer_group = layers_group.require_group(str(layer_index))
-    layer_group.attrs["layer_index"] = layer_index
+    root = _open_archive_root(path)
+    _ensure_archive_layout(root)
 
-    # Append each write as a new leading entry.
-    if "activation" in layer_group:
-        activation_ds = layer_group["activation"]
+    single_group = root["representations"]["single"]
+    single_group.create_dataset(
+        layer_key,
+        data=activation_array,
+        shape=activation_array.shape,
+        chunks=_single_chunks(activation_array.shape),
+        dtype=STORAGE_DTYPE,
+        overwrite=True,
+    )
 
-        if activation_ds.ndim != 3:
-            raise ValueError(
-                "Existing activation dataset must be 3D with shape "
-                "(num_writes, tokens, hidden_dim)"
-            )
-        if activation_ds.shape[1] != tokens:
-            raise ValueError(
-                "Token dimension mismatch: "
-                f"existing={activation_ds.shape[1]}, new={tokens}"
-            )
-        if activation_ds.shape[2] != hidden_dim:
-            raise ValueError(
-                "Hidden dimension mismatch: "
-                f"existing={activation_ds.shape[2]}, new={hidden_dim}"
-            )
-
-        old_writes = activation_ds.shape[0]
-        activation_ds.resize((old_writes + 1, tokens, hidden_dim))
-        activation_ds[old_writes, :, :] = activation_array
-    else:
-        token_chunk = max(1, min(tokens, 1024))
-        layer_group.create_dataset(
-            "activation",
-            data=activation_array[np.newaxis, :, :],
-            shape=(1, tokens, hidden_dim),
-            chunks=(1, token_chunk, hidden_dim),
-            dtype=STORAGE_DTYPE,
-            overwrite=False,
-        )
-
-    activation_ds = layer_group["activation"]
-    activation_ds.attrs["write_policy"] = "append"
-    activation_ds.attrs["storage_dtype"] = np.dtype(STORAGE_DTYPE).name
-    activation_ds.attrs["tokens"] = tokens
-    activation_ds.attrs["hidden_dim"] = hidden_dim
-    activation_ds.attrs["num_writes"] = activation_ds.shape[0]
+    ds = single_group[layer_key]
+    ds.attrs["layer_index"] = layer_index
+    ds.attrs["representation_type"] = "single"
+    ds.attrs["storage_dtype"] = np.dtype(STORAGE_DTYPE).name
 
 
 # ============================================================
 # METHOD 4
 # ============================================================
 
-def store_pair_representation(path, pair_array):
+def store_pair_representation(path, pair_array, layer_index=0):
     """
-    Store pair representation embeddings.
-
-    Pair representations capture relationships between residues
-    or tokens in the model and are commonly used in protein
-    structure prediction models like OpenFold.
+    Store a per-layer pair representation tensor.
 
     Typical shape:
-        (tokens, tokens, pair_dimension)
+        (num_residues, num_residues, pair_dim)
+    but any N-D numeric array with ndim >= 2 is accepted.
 
     Archive layout:
-        representations/pair
+        representations/pair/layer_XX
 
     Storage behavior:
-        Each call appends one pair tensor to the dataset,
-        so stored arrays have shape:
-        (num_writes, tokens, tokens, pair_dimension)
-
-    Responsibilities:
-    -----------------
-    - Validate input shape
-    - Create representations group if needed
-    - Store pair representation array
+        Each layer is stored as one named dataset. Writing to the same
+        layer index overwrites that layer dataset.
 
     Parameters
     ----------
@@ -174,63 +198,43 @@ def store_pair_representation(path, pair_array):
         Root path to the Zarr archive.
 
     pair_array : numpy.ndarray
-        Pair representation tensor.
+        Pair representation tensor for one layer.
+
+    layer_index : int, optional
+        Layer index used to build the key layer_XX.
+        Defaults to 0 for backward compatibility with older calls.
 
     Returns
     -------
     None
     """
-    pair_array = _normalize_embedding_array(
+    layer_key = _layer_name(layer_index)
+    pair_array = _normalize_numeric_array(
         pair_array,
-        expected_ndim=3,
         array_name="pair_array",
+        min_ndim=2,
     )
 
-    tokens_i, tokens_j, pair_dim = pair_array.shape
-    if tokens_i != tokens_j:
+    if pair_array.shape[0] != pair_array.shape[1]:
         raise ValueError(
-            "pair_array first two dimensions must match (tokens x tokens)"
+            "pair_array first two dimensions must match (num_residues x num_residues); "
+            f"received shape {pair_array.shape}"
         )
 
-    root = zarr.open_group(path, mode="a")
-    representations_group = root.require_group("representations")
+    root = _open_archive_root(path)
+    _ensure_archive_layout(root)
 
-    if "pair" in representations_group:
-        pair_ds = representations_group["pair"]
-        if pair_ds.ndim != 4:
-            raise ValueError(
-                "Existing pair dataset must be 4D with shape "
-                "(num_writes, tokens, tokens, pair_dim)"
-            )
-        if pair_ds.shape[1] != tokens_i or pair_ds.shape[2] != tokens_j:
-            raise ValueError(
-                "Token dimension mismatch: "
-                f"existing=({pair_ds.shape[1]}, {pair_ds.shape[2]}), "
-                f"new=({tokens_i}, {tokens_j})"
-            )
-        if pair_ds.shape[3] != pair_dim:
-            raise ValueError(
-                "Pair dimension mismatch: "
-                f"existing={pair_ds.shape[3]}, new={pair_dim}"
-            )
+    pair_group = root["representations"]["pair"]
+    pair_group.create_dataset(
+        layer_key,
+        data=pair_array,
+        shape=pair_array.shape,
+        chunks=_pair_chunks(pair_array.shape),
+        dtype=STORAGE_DTYPE,
+        overwrite=True,
+    )
 
-        old_writes = pair_ds.shape[0]
-        pair_ds.resize((old_writes + 1, tokens_i, tokens_j, pair_dim))
-        pair_ds[old_writes, :, :, :] = pair_array
-    else:
-        token_chunk = max(1, min(tokens_i, 128))
-        representations_group.create_dataset(
-            "pair",
-            data=pair_array[np.newaxis, :, :, :],
-            shape=(1, tokens_i, tokens_j, pair_dim),
-            chunks=(1, token_chunk, token_chunk, pair_dim),
-            dtype=STORAGE_DTYPE,
-            overwrite=False,
-        )
-
-    pair_ds = representations_group["pair"]
-    pair_ds.attrs["write_policy"] = "append"
-    pair_ds.attrs["storage_dtype"] = np.dtype(STORAGE_DTYPE).name
-    pair_ds.attrs["tokens"] = tokens_i
-    pair_ds.attrs["pair_dim"] = pair_dim
-    pair_ds.attrs["num_writes"] = pair_ds.shape[0]
+    ds = pair_group[layer_key]
+    ds.attrs["layer_index"] = layer_index
+    ds.attrs["representation_type"] = "pair"
+    ds.attrs["storage_dtype"] = np.dtype(STORAGE_DTYPE).name
