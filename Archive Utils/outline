@@ -3,37 +3,52 @@ VizFold Archive Utilities
 =========================
 
 This module contains independent utilities for converting VizFold inference
-outputs into a standardized Zarr archive format. These functions are designed
+outputs into a standardized Zarr archive format following the VizFold Inference
+Trace Archive specification v1.0 (March 2026). These functions are designed
 to support lightweight, offline visualization of model internals such as:
 
-- Layer activations
-- Attention heads
-- Pair representations
+- Single representations (per-residue embeddings)
+- Pair representations (residue-residue relationships)
+- Attention maps (triangle_start, triangle_end, pairwise)
 - Protein structure outputs
 
 All methods are intentionally modular so they can be implemented independently
 by different contributors.
 
-Archive layout target (example):
+Archive layout target (VizFold 1.0 specification):
 
 trace.zarr/
 │
-├── layers/
-│   ├── 0/
-│   │   ├── activation
-│   │   └── attention
-│   ├── 1/
-│   │   ├── activation
-│   │   └── attention
+├── metadata/
+│   ├── model_version
+│   ├── config_version
+│   ├── sequence
+│   ├── num_residues
+│   ├── num_recycles
+│   ├── recycle_info
+│   ├── residue_index
+│   └── representation_names
 │
 ├── representations/
-│   └── pair
+│   ├── single/
+│   │   ├── layer_00
+│   │   ├── layer_01
+│   │   └── ...
+│   └── pair/
+│       ├── layer_00
+│       ├── layer_01
+│       └── ...
 │
-├── structure/
-│   ├── coordinates
-│   └── residue_types
+├── attention/
+│   └── triangle_start/
+│       ├── layer_00
+│       ├── layer_01
+│       └── ...
 │
-└── metadata
+└── structure/
+    ├── atom_positions
+    ├── atom_mask
+    └── ptm
 """
 
 import numpy as np
@@ -177,24 +192,24 @@ def tensor_to_zarr_array(path, tensor, chunks=None, overwrite=False):
 # METHOD 3
 # ============================================================
 
-def store_layer_activation(path, layer_index, activation_array):
+def store_single_representation(path, layer_index, representation_array, overwrite=False):
     """
-    Store a transformer layer activation inside the archive.
+    Store a per-residue single representation for a transformer layer.
 
-    Layer activations represent the hidden state outputs from a
-    transformer block.
+    Single representations capture per-residue (or per-token) embeddings
+    from a transformer block. These are distinct from pair representations
+    which capture residue-residue relationships.
+
+    This follows the VizFold Inference Trace Archive specification v1.0,
+    storing representations at: representations/single/layer_{layer_index:02d}
 
     Typical shape:
-        (tokens, hidden_dimension)
+        (num_residues, hidden_dimension)
 
-    Archive layout:
-        layers/{layer_index}/activation
-
-    Responsibilities:
-    -----------------
-    - Ensure the correct archive group exists
-    - Validate activation shape
-    - Write the activation array to the appropriate location
+    Archive layout (VizFold 1.0):
+        representations/single/layer_00
+        representations/single/layer_01
+        ...
 
     Parameters
     ----------
@@ -202,16 +217,34 @@ def store_layer_activation(path, layer_index, activation_array):
         Root path to the Zarr archive.
 
     layer_index : int
-        Index of the transformer layer.
+        Index of the transformer layer (0-indexed).
 
-    activation_array : numpy.ndarray
-        Activation tensor with shape (tokens, hidden_dim).
+    representation_array : numpy.ndarray
+        Single representation tensor with shape (num_residues, hidden_dim).
+
+    overwrite : bool, optional
+        Whether to overwrite existing data. Default is False.
 
     Returns
     -------
     None
+
+    Examples
+    --------
+    >>> store_single_representation("trace.zarr", 0, layer_0_repr)
+    >>> store_single_representation("trace.zarr", 1, layer_1_repr)
     """
-    pass
+    representation_array = tensor_to_numpy(representation_array)
+
+    if representation_array.ndim != 2:
+        raise ValueError(
+            f"Expected 2D representation array (num_residues, hidden_dim), "
+            f"got {representation_array.ndim}D with shape {representation_array.shape}"
+        )
+
+    layer_name = f"layer_{layer_index:02d}"
+    array_path = f"{path.rstrip('/')}::representations/single/{layer_name}"
+    tensor_to_zarr_array(array_path, representation_array, overwrite=overwrite)
 
 
 # ============================================================
@@ -271,18 +304,30 @@ def store_pair_representation(path, pair_array):
 # METHOD 5
 # ============================================================
 
-def store_attention_heads(path, layer_index, attention_array):
+def store_attention(path, attention_type, layer_index, attention_array, overwrite=False):
     """
-    Store attention head maps for a transformer layer.
+    Store attention head maps for a transformer layer by attention type.
 
-    Attention maps describe relationships between tokens and
-    are commonly visualized to interpret model behavior.
+    Attention maps describe relationships between tokens and are commonly
+    visualized to interpret model behavior. The VizFold spec recognizes
+    multiple attention types that serve different purposes:
+
+    - "triangle_start": Triangle attention starting from one edge
+    - "triangle_end": Triangle attention ending at one edge
+    - "pairwise": Standard pairwise attention between residues
+
+    This follows the VizFold Inference Trace Archive specification v1.0,
+    storing attention at: attention/{attention_type}/layer_{layer_index:02d}
 
     Expected tensor shape:
         (num_heads, tokens, tokens)
 
-    Archive layout:
-        layers/{layer_index}/attention
+    Archive layout (VizFold 1.0):
+        attention/triangle_start/layer_00
+        attention/triangle_start/layer_01
+        attention/triangle_end/layer_00
+        attention/pairwise/layer_00
+        ...
 
     Recommended chunking:
         (1, tokens, tokens)
@@ -290,30 +335,38 @@ def store_attention_heads(path, layer_index, attention_array):
     This chunking allows loading a single attention head without
     loading the entire tensor.
 
-    Responsibilities:
-    -----------------
-    - Validate tensor shape
-    - Ensure correct archive structure exists
-    - Store the attention maps
-
     Parameters
     ----------
     path : str
         Root path to the archive.
 
+    attention_type : str
+        Type of attention mechanism. Common values include:
+        - "triangle_start": Triangle attention (starting node)
+        - "triangle_end": Triangle attention (ending node)
+        - "pairwise": Standard pairwise attention
+
     layer_index : int
-        Transformer layer index.
+        Transformer layer index (0-indexed).
 
     attention_array : numpy.ndarray
-        Attention tensor.
+        Attention tensor with shape (num_heads, tokens, tokens).
+
+    overwrite : bool, optional
+        Whether to overwrite existing data. Default is False.
 
     Returns
     -------
     None
+
+    Examples
+    --------
+    >>> store_attention("trace.zarr", "triangle_start", 0, attn_array)
+    >>> store_attention("trace.zarr", "triangle_end", 0, attn_array)
+    >>> store_attention("trace.zarr", "pairwise", 0, attn_array)
     """
     attention_array = tensor_to_numpy(attention_array)
 
-    # Validate tensor shape: (num_heads, tokens, tokens)
     if attention_array.ndim != 3:
         raise ValueError(
             f"Expected 3D attention array (num_heads, tokens, tokens), "
@@ -327,10 +380,16 @@ def store_attention_heads(path, layer_index, attention_array):
             f"got shape {attention_array.shape}"
         )
 
-    # Use method 2: archive_path::dataset_path for in-archive storage
-    array_path = f"{path.rstrip('/')}::layers/{layer_index}/attention"
+    if not attention_type or not isinstance(attention_type, str):
+        raise ValueError(
+            "attention_type must be a non-empty string (e.g., 'triangle_start', "
+            "'triangle_end', 'pairwise')"
+        )
+
+    layer_name = f"layer_{layer_index:02d}"
+    array_path = f"{path.rstrip('/')}::attention/{attention_type}/{layer_name}"
     chunks = (1, tokens_i, tokens_j)
-    tensor_to_zarr_array(array_path, attention_array, chunks=chunks, overwrite=True)
+    tensor_to_zarr_array(array_path, attention_array, chunks=chunks, overwrite=overwrite)
 
 
 # ============================================================
@@ -417,17 +476,18 @@ def store_structure_coordinates(path, coordinates, residue_types=None):
 # METHOD 7
 # ============================================================
 
-def load_attention_head(path, layer_index, head_index):
+def load_attention_head(path, attention_type, layer_index, head_index):
     """
     Load a single attention head from the archive.
 
     Selective loading is important for visualization because
     attention tensors can be very large.
 
-    This function retrieves only the requested head.
+    This function retrieves only the requested head for a specific
+    attention type and layer.
 
-    Archive location:
-        layers/{layer_index}/attention
+    Archive location (VizFold 1.0):
+        attention/{attention_type}/layer_{layer_index:02d}
 
     Expected output shape:
         (tokens, tokens)
@@ -437,8 +497,11 @@ def load_attention_head(path, layer_index, head_index):
     path : str
         Root path to the archive.
 
+    attention_type : str
+        Type of attention mechanism (e.g., "triangle_start", "triangle_end", "pairwise").
+
     layer_index : int
-        Transformer layer index.
+        Transformer layer index (0-indexed).
 
     head_index : int
         Index of the attention head.
@@ -447,40 +510,54 @@ def load_attention_head(path, layer_index, head_index):
     -------
     numpy.ndarray
         Attention matrix for the specified head.
+
+    Examples
+    --------
+    >>> attn = load_attention_head("trace.zarr", "triangle_start", 0, 2)
+    >>> attn.shape
+    (128, 128)
     """
     root = zarr.open(path, mode='r')
- 
-    layer_key = f"layers/{layer_index}"
-    if layer_key not in root:
+
+    if "attention" not in root:
         raise KeyError(
-            f"Layer {layer_index} not found in archive at '{path}'. "
-            f"Expected group '{layer_key}'."
+            f"No 'attention' group found in archive at '{path}'."
         )
- 
-    layer_group = root[layer_key]
- 
-    if "attention" not in layer_group:
+
+    attention_group = root["attention"]
+
+    if attention_type not in attention_group:
         raise KeyError(
-            f"No attention data found for layer {layer_index} "
-            f"in archive at '{path}'."
+            f"Attention type '{attention_type}' not found in archive at '{path}'. "
+            f"Available types: {list(attention_group.keys())}"
         )
- 
-    attention = layer_group["attention"]
- 
+
+    type_group = attention_group[attention_type]
+    layer_name = f"layer_{layer_index:02d}"
+
+    if layer_name not in type_group:
+        raise KeyError(
+            f"Layer {layer_index} ('{layer_name}') not found for attention type "
+            f"'{attention_type}' in archive at '{path}'. "
+            f"Available layers: {list(type_group.keys())}"
+        )
+
+    attention = type_group[layer_name]
+
     if attention.ndim != 3:
         raise ValueError(
             f"Expected stored attention to be 3D (num_heads, tokens, tokens), "
             f"got {attention.ndim}D with shape {attention.shape}"
         )
- 
+
     num_heads = attention.shape[0]
- 
+
     if head_index < 0 or head_index >= num_heads:
         raise IndexError(
             f"head_index {head_index} is out of range for layer {layer_index} "
             f"which has {num_heads} attention head(s)."
         )
- 
+
     return np.asarray(attention[head_index])
 
 
@@ -585,14 +662,41 @@ def validate_archive(path):
     return True
 
 
-def ingest_attention_txt(archive_path, txt_file, layer_index, num_tokens, overwrite=False):
+def ingest_attention_txt(archive_path, txt_file, layer_index, num_tokens, 
+                         attention_type="pairwise", overwrite=False):
     """
-    Parse a VizFold attention text file and store it under layers/{layer_index}/attention.
+    Parse a VizFold attention text file and store it under attention/{attention_type}/layer_{layer_index:02d}.
 
     Expected input format:
         Layer <idx>, Head <idx>
         <res_i> <res_j> <score>
         ...
+
+    Parameters
+    ----------
+    archive_path : str
+        Root path to the Zarr archive.
+
+    txt_file : str
+        Path to the attention text file.
+
+    layer_index : int
+        Transformer layer index.
+
+    num_tokens : int
+        Number of tokens/residues in the sequence.
+
+    attention_type : str, optional
+        Type of attention (e.g., "triangle_start", "triangle_end", "pairwise").
+        Default is "pairwise".
+
+    overwrite : bool, optional
+        Whether to overwrite existing data. Default is False.
+
+    Returns
+    -------
+    dict
+        Summary of ingestion including layer_index, num_heads, num_tokens, and source_file.
     """
     if num_tokens <= 0:
         raise ValueError("num_tokens must be a positive integer")
@@ -648,9 +752,10 @@ def ingest_attention_txt(archive_path, txt_file, layer_index, num_tokens, overwr
         for res_i, res_j, score in entries:
             attention[head_idx, res_i, res_j] = score
 
-    store_attention_heads(archive_path, layer_index, attention)
+    store_attention(archive_path, attention_type, layer_index, attention, overwrite=overwrite)
     return {
         "layer_index": layer_index,
+        "attention_type": attention_type,
         "num_heads": num_heads,
         "num_tokens": num_tokens,
         "source_file": txt_file,
