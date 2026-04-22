@@ -469,6 +469,9 @@ def store_structure_coordinates(path, atom_positions, atom_mask=None, ptm=None, 
     overwrite : bool, optional
         Whether to overwrite existing data. Default is False.
 
+    overwrite : bool, optional
+        Whether to overwrite existing structure datasets. Default is False.
+
     Returns
     -------
     None
@@ -635,7 +638,7 @@ def load_attention_head(path, attention_type, layer_index, head_index):
 # METHOD 8
 # ============================================================
 
-def validate_archive(path):
+def validate_archive(path, strict=True, return_details=False):
     """
     Validate the integrity of a VizFold trace archive.
 
@@ -665,11 +668,32 @@ def validate_archive(path):
     path : str
         Root path to the Zarr archive.
 
+    strict : bool, optional
+        Whether to enforce complete-archive requirements. Default is True.
+
+    return_details : bool, optional
+        If True, return a dictionary with validity, warnings, and errors.
+        If False, return only a boolean.
+
     Returns
     -------
-    bool
-        True if the archive appears valid, False otherwise.
+    bool | dict
+        Boolean validity, or a detailed validation result when
+        return_details=True.
     """
+    result = {
+        "valid": True,
+        "warnings": [],
+        "errors": [],
+    }
+
+    def _fail(message):
+        result["valid"] = False
+        result["errors"].append(message)
+
+    def _warn(message):
+        result["warnings"].append(message)
+
     try:
         root = zarr.open(path, mode='r')
     except Exception:
@@ -844,31 +868,94 @@ def ingest_attention_txt(archive_path, txt_file, layer_index, num_tokens,
     }
 
 
-def _extract_first_matching_array(container, key_substrings):
-    """Depth-first search for the first array-like value whose key path matches substrings."""
-    key_substrings = [s.lower() for s in key_substrings]
+def _extract_best_matching_array(container, key_token_patterns):
+    """
+    Find the best array-like match in a nested container using tokenized key patterns.
+
+    Matching is stricter than raw substring search:
+    - Key paths are tokenized on non-alphanumeric boundaries.
+    - A pattern matches only if all pattern tokens are present in the path tokens.
+    - The best match prefers more specific patterns and shorter paths.
+
+    Parameters
+    ----------
+    container : dict | list | tuple
+        Nested object to search.
+
+    key_token_patterns : list[list[str]]
+        Ordered token patterns to match (e.g., [["final", "atom", "positions"]]).
+
+    Returns
+    -------
+    dict | None
+        {
+            "array": numpy.ndarray,
+            "matched_key": str,
+            "pattern": list[str],
+            "shape": tuple
+        }
+        Returns None if no matching array is found.
+    """
+    normalized_patterns = [
+        [token.lower() for token in pattern if token]
+        for pattern in key_token_patterns
+        if pattern
+    ]
+
+    best = None
+
+    def _tokenize(path):
+        return [token for token in re.split(r"[^a-z0-9]+", path.lower()) if token]
+
+    def _consider(path, value):
+        nonlocal best
+
+        try:
+            array = tensor_to_numpy(value)
+        except Exception:
+            return
+
+        if not isinstance(array, np.ndarray):
+            return
+
+        path_tokens = _tokenize(path)
+        if not path_tokens:
+            return
+
+        path_token_set = set(path_tokens)
+
+        for pattern in normalized_patterns:
+            if all(token in path_token_set for token in pattern):
+                # Higher score means a more specific and tighter key match.
+                score = len(pattern) * 100 - len(path_tokens)
+                if best is None or score > best["score"]:
+                    best = {
+                        "array": array,
+                        "matched_key": path,
+                        "pattern": pattern,
+                        "shape": tuple(array.shape),
+                        "score": score,
+                    }
 
     def _walk(obj, path_prefix=""):
         if isinstance(obj, dict):
-            for k, v in obj.items():
-                path = f"{path_prefix}/{k}" if path_prefix else str(k)
-                lowered = path.lower()
-                if all(s in lowered for s in key_substrings):
-                    arr = tensor_to_numpy(v)
-                    if isinstance(arr, np.ndarray):
-                        return arr
-                found = _walk(v, path)
-                if found is not None:
-                    return found
+            for key, value in obj.items():
+                path = f"{path_prefix}/{key}" if path_prefix else str(key)
+                _consider(path, value)
+                _walk(value, path)
         elif isinstance(obj, (list, tuple)):
-            for idx, v in enumerate(obj):
+            for idx, value in enumerate(obj):
                 path = f"{path_prefix}/{idx}" if path_prefix else str(idx)
-                found = _walk(v, path)
-                if found is not None:
-                    return found
+                _consider(path, value)
+                _walk(value, path)
+
+    _walk(container)
+
+    if best is None:
         return None
 
-    return _walk(container)
+    best.pop("score", None)
+    return best
 
 
 def ingest_output_pkl(archive_path, pkl_file, overwrite=False):
@@ -891,11 +978,47 @@ def ingest_output_pkl(archive_path, pkl_file, overwrite=False):
         "source_file": pkl_file,
         "stored": [],
         "skipped": [],
+        "key_matches": {},
     }
 
-    final_positions = _extract_first_matching_array(output_dict, ["final", "atom", "positions"])
-    final_atom_mask = _extract_first_matching_array(output_dict, ["final", "atom", "mask"])
-    ptm = _extract_first_matching_array(output_dict, ["ptm"])
+    final_positions_match = _extract_best_matching_array(
+        output_dict,
+        [["final", "atom", "positions"], ["final", "positions"]],
+    )
+    final_atom_mask_match = _extract_best_matching_array(
+        output_dict,
+        [["final", "atom", "mask"], ["atom", "mask"]],
+    )
+    ptm_match = _extract_best_matching_array(output_dict, [["ptm"], ["predicted", "tm"]])
+    pair_match = _extract_best_matching_array(
+        output_dict,
+        [["pair", "representation"], ["pair", "activations"], ["pair"]],
+    )
+
+    summary["key_matches"]["final_positions"] = {
+        "pattern": ["final", "atom", "positions"],
+        "matched_key": None if final_positions_match is None else final_positions_match["matched_key"],
+        "shape": None if final_positions_match is None else final_positions_match["shape"],
+    }
+    summary["key_matches"]["final_atom_mask"] = {
+        "pattern": ["final", "atom", "mask"],
+        "matched_key": None if final_atom_mask_match is None else final_atom_mask_match["matched_key"],
+        "shape": None if final_atom_mask_match is None else final_atom_mask_match["shape"],
+    }
+    summary["key_matches"]["ptm"] = {
+        "pattern": ["ptm"],
+        "matched_key": None if ptm_match is None else ptm_match["matched_key"],
+        "shape": None if ptm_match is None else ptm_match["shape"],
+    }
+    summary["key_matches"]["pair_representation"] = {
+        "pattern": ["pair"],
+        "matched_key": None if pair_match is None else pair_match["matched_key"],
+        "shape": None if pair_match is None else pair_match["shape"],
+    }
+
+    final_positions = None if final_positions_match is None else final_positions_match["array"]
+    final_atom_mask = None if final_atom_mask_match is None else final_atom_mask_match["array"]
+    ptm = None if ptm_match is None else ptm_match["array"]
 
     if final_positions is not None:
         if final_positions.ndim == 3 and final_positions.shape[-1] == 3:
@@ -929,7 +1052,7 @@ def ingest_output_pkl(archive_path, pkl_file, overwrite=False):
     else:
         summary["skipped"].append("final_atom_positions (not found)")
 
-    pair_array = _extract_first_matching_array(output_dict, ["pair"])
+    pair_array = None if pair_match is None else pair_match["array"]
     if pair_array is not None and isinstance(pair_array, np.ndarray):
         if pair_array.ndim == 3 and pair_array.shape[0] == pair_array.shape[1]:
             store_pair_representation(archive_path, 0, pair_array, overwrite=overwrite)
@@ -940,3 +1063,133 @@ def ingest_output_pkl(archive_path, pkl_file, overwrite=False):
         summary["skipped"].append("representations/pair/layer_00 (not found)")
 
     return summary
+
+
+# ============================================================
+# METHOD 9
+# ============================================================
+
+def store_metadata(path, model_version, config_version, sequence,
+                   num_residues, num_recycles, recycle_info=None,
+                   residue_index=None, representation_names=None, overwrite=False):
+    """
+    Store run-level metadata for a VizFold archive.
+
+    This group records the high-level run context that helps downstream
+    tools identify, validate, and reproduce an archive.
+
+    Archive layout (VizFold 1.0):
+        metadata/model_version
+        metadata/config_version
+        metadata/sequence
+        metadata/num_residues
+        metadata/num_recycles
+        metadata/recycle_info
+        metadata/residue_index
+        metadata/representation_names
+
+    Parameters
+    ----------
+    path : str
+        Root path to the Zarr archive.
+
+    model_version : str
+        Model identifier or release version.
+
+    config_version : str
+        Configuration identifier or release version.
+
+    sequence : str
+        Input sequence for the run.
+
+    num_residues : int
+        Number of residues in the sequence.
+
+    num_recycles : int
+        Number of recycles used during inference.
+
+    recycle_info : optional array-like
+        Additional per-recycle metadata.
+
+    residue_index : optional array-like
+        Residue index values for the sequence.
+
+    representation_names : optional array-like
+        Ordered names of stored representations.
+
+    overwrite : bool, optional
+        Whether to overwrite existing metadata datasets. Default is False.
+
+    Returns
+    -------
+    None
+    """
+    archive_path = path.rstrip("/")
+    root = zarr.open(archive_path, mode="a")
+    root.require_group("metadata")
+
+    if int(num_residues) < 0:
+        raise ValueError("num_residues must be non-negative")
+    if int(num_recycles) < 0:
+        raise ValueError("num_recycles must be non-negative")
+
+    tensor_to_zarr_array(
+        f"{archive_path}::metadata/model_version",
+        np.asarray(model_version),
+        overwrite=overwrite,
+    )
+    tensor_to_zarr_array(
+        f"{archive_path}::metadata/config_version",
+        np.asarray(config_version),
+        overwrite=overwrite,
+    )
+    tensor_to_zarr_array(
+        f"{archive_path}::metadata/sequence",
+        np.asarray(sequence),
+        overwrite=overwrite,
+    )
+    tensor_to_zarr_array(
+        f"{archive_path}::metadata/num_residues",
+        np.asarray(num_residues, dtype=np.int32),
+        overwrite=overwrite,
+    )
+    tensor_to_zarr_array(
+        f"{archive_path}::metadata/num_recycles",
+        np.asarray(num_recycles, dtype=np.int32),
+        overwrite=overwrite,
+    )
+
+    if recycle_info is not None:
+        recycle_info_array = tensor_to_numpy(recycle_info)
+        tensor_to_zarr_array(
+            f"{archive_path}::metadata/recycle_info",
+            recycle_info_array,
+            overwrite=overwrite,
+        )
+
+    if residue_index is not None:
+        residue_index_array = tensor_to_numpy(residue_index)
+        if residue_index_array.ndim != 1:
+            residue_index_array = np.squeeze(residue_index_array)
+        if residue_index_array.ndim != 1:
+            raise ValueError(
+                f"residue_index must be 1D, got shape {residue_index_array.shape}"
+            )
+        if residue_index_array.shape[0] != int(num_residues):
+            raise ValueError(
+                f"residue_index length ({residue_index_array.shape[0]}) must match "
+                f"num_residues ({int(num_residues)})"
+            )
+        tensor_to_zarr_array(
+            f"{archive_path}::metadata/residue_index",
+            residue_index_array,
+            overwrite=overwrite,
+        )
+
+    if representation_names is not None:
+        representation_names_array = tensor_to_numpy(representation_names)
+        tensor_to_zarr_array(
+            f"{archive_path}::metadata/representation_names",
+            representation_names_array,
+            overwrite=overwrite,
+        )
