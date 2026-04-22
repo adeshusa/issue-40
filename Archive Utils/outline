@@ -189,12 +189,28 @@ def tensor_to_zarr_array(path, tensor, chunks=None, overwrite=False):
 
 
 # ============================================================
+# INTERNAL HELPERS
+# ============================================================
+
+def _validate_layer_index(layer_index):
+    """
+    Validate a transformer layer index used for per-layer archive paths.
+    """
+    if not isinstance(layer_index, (int, np.integer)):
+        raise TypeError(
+            f"layer_index must be an integer, got {type(layer_index).__name__}"
+        )
+    if layer_index < 0:
+        raise ValueError(f"layer_index must be >= 0, got {layer_index}")
+
+
+# ============================================================
 # METHOD 3
 # ============================================================
 
-def store_single_representation(path, layer_index, representation_array, overwrite=False):
+def store_single_representation(path, layer_index, single_array, overwrite=False):
     """
-    Store a per-residue single representation for a transformer layer.
+    Store per-layer single representation embeddings.
 
     Single representations capture per-residue (or per-token) embeddings
     from a transformer block. These are distinct from pair representations
@@ -219,7 +235,7 @@ def store_single_representation(path, layer_index, representation_array, overwri
     layer_index : int
         Index of the transformer layer (0-indexed).
 
-    representation_array : numpy.ndarray
+    single_array : numpy.ndarray
         Single representation tensor with shape (num_residues, hidden_dim).
 
     overwrite : bool, optional
@@ -234,26 +250,27 @@ def store_single_representation(path, layer_index, representation_array, overwri
     >>> store_single_representation("trace.zarr", 0, layer_0_repr)
     >>> store_single_representation("trace.zarr", 1, layer_1_repr)
     """
-    representation_array = tensor_to_numpy(representation_array)
+    _validate_layer_index(layer_index)
+    single_array = tensor_to_numpy(single_array)
 
-    if representation_array.ndim != 2:
+    if single_array.ndim != 2:
         raise ValueError(
             f"Expected 2D representation array (num_residues, hidden_dim), "
-            f"got {representation_array.ndim}D with shape {representation_array.shape}"
+            f"got {single_array.ndim}D with shape {single_array.shape}"
         )
 
     layer_name = f"layer_{layer_index:02d}"
     array_path = f"{path.rstrip('/')}::representations/single/{layer_name}"
-    tensor_to_zarr_array(array_path, representation_array, overwrite=overwrite)
+    tensor_to_zarr_array(array_path, single_array, overwrite=overwrite)
 
 
 # ============================================================
 # METHOD 4
 # ============================================================
 
-def store_pair_representation(path, pair_array):
+def store_pair_representation(path, layer_index, pair_array, overwrite=False):
     """
-    Store pair representation embeddings.
+    Store per-layer pair representation embeddings.
 
     Pair representations capture relationships between residues
     or tokens in the model and are commonly used in protein
@@ -262,27 +279,41 @@ def store_pair_representation(path, pair_array):
     Typical shape:
         (tokens, tokens, pair_dimension)
 
-    Archive layout:
-        representations/pair
+    Archive layout (VizFold 1.0):
+        representations/pair/layer_00
+        representations/pair/layer_01
+        ...
 
     Responsibilities:
     -----------------
     - Validate input shape
-    - Create representations group if needed
-    - Store pair representation array
+    - Store pair representation for an explicit layer index
 
     Parameters
     ----------
     path : str
         Root path to the Zarr archive.
 
+    layer_index : int
+        Index of the transformer layer (0-indexed).
+
     pair_array : numpy.ndarray
         Pair representation tensor.
+
+    overwrite : bool, optional
+        Whether to overwrite existing data. Default is False.
 
     Returns
     -------
     None
+
+    Examples
+    --------
+    >>> store_pair_representation("trace.zarr", 0, pair_layer_0)
+    >>> store_pair_representation("trace.zarr", 1, pair_layer_1)
+    >>> store_pair_representation("trace.zarr", 3, pair_layer_3)
     """
+    _validate_layer_index(layer_index)
     pair_array = tensor_to_numpy(pair_array)
 
     if pair_array.ndim != 3:
@@ -296,8 +327,9 @@ def store_pair_representation(path, pair_array):
             f"got shape {pair_array.shape}"
         )
 
-    array_path = f"{path.rstrip('/')}::representations/pair"
-    tensor_to_zarr_array(array_path, pair_array, overwrite=True)
+    layer_name = f"layer_{layer_index:02d}"
+    array_path = f"{path.rstrip('/')}::representations/pair/{layer_name}"
+    tensor_to_zarr_array(array_path, pair_array, overwrite=overwrite)
 
 
 # ============================================================
@@ -396,80 +428,118 @@ def store_attention(path, attention_type, layer_index, attention_array, overwrit
 # METHOD 6
 # ============================================================
 
-def store_structure_coordinates(path, coordinates, residue_types=None):
+def store_structure_coordinates(path, atom_positions, atom_mask=None, ptm=None, overwrite=False):
     """
-    Store predicted protein structure coordinates.
+    Store predicted protein structure atom positions and optional confidence fields.
 
-    These coordinates represent the predicted 3D structure of
-    a protein sequence.
+    These positions represent predicted 3D atomic coordinates
+    for a protein sequence.
 
-    Expected coordinate shape:
-        (num_residues, 3)
+    Expected atom position shape:
+        (num_residues, 3) or (num_residues, num_atoms, 3)
 
-    Archive layout:
-        structure/coordinates
-        structure/residue_types (optional)
+    Archive layout (VizFold 1.0):
+        structure/atom_positions
+        structure/atom_mask (optional)
+        structure/ptm (optional)
 
     Responsibilities:
     -----------------
-    - Validate coordinate dimensions
-    - Create structure group
-    - Store coordinate array
-    - Optionally store residue type information
+    - Validate atom position dimensions
+    - Store atom position array
+    - Optionally store atom mask
+    - Optionally store pTM confidence
 
     Parameters
     ----------
     path : str
         Root path to the Zarr archive.
 
-    coordinates : numpy.ndarray
-        Array of atomic coordinates.
+    atom_positions : numpy.ndarray
+        Array of atomic positions with shape
+        (num_residues, 3) or (num_residues, num_atoms, 3).
 
-    residue_types : optional array-like
-        Residue identity information.
+    atom_mask : optional array-like
+        Optional atom-presence mask. If provided, first dimension must match
+        num_residues.
+
+    ptm : optional float | numpy.ndarray
+        Optional predicted TM-score confidence value. Must be scalar.
+
+    overwrite : bool, optional
+        Whether to overwrite existing data. Default is False.
 
     Returns
     -------
     None
     """
-    coordinates = tensor_to_numpy(coordinates)
+    atom_positions = tensor_to_numpy(atom_positions)
 
-    # Validate coordinate dimensions: (num_residues, 3)
-    if coordinates.ndim != 2:
+    # Validate atom position dimensions: (num_residues, 3) or (num_residues, num_atoms, 3)
+    if atom_positions.ndim not in (2, 3):
         raise ValueError(
-            f"Expected 2D coordinate array (num_residues, 3), "
-            f"got {coordinates.ndim}D with shape {coordinates.shape}"
+            f"Expected 2D or 3D atom position array, "
+            f"got {atom_positions.ndim}D with shape {atom_positions.shape}"
         )
-    if coordinates.shape[-1] != 3:
+    if atom_positions.shape[-1] != 3:
         raise ValueError(
             f"Expected last dimension to be 3 (x, y, z), "
-            f"got {coordinates.shape[-1]}"
+            f"got {atom_positions.shape[-1]}"
         )
 
-    num_residues = coordinates.shape[0]
-    archive_path = path.rstrip("/")
+    num_residues = atom_positions.shape[0]
+    root = zarr.open(path.rstrip("/"), mode="a")
+    structure_group = root.require_group("structure")
 
-    # Use method 2 for in-archive storage
-    tensor_to_zarr_array(
-        f"{archive_path}::structure/coordinates",
-        coordinates,
-        overwrite=True,
-    )
+    if "atom_positions" in structure_group:
+        if not overwrite:
+            raise FileExistsError(
+                "Dataset already exists at 'structure/atom_positions'. "
+                "Set overwrite=True to replace it."
+            )
+        del structure_group["atom_positions"]
+    structure_group["atom_positions"] = zarr.array(atom_positions)
 
-    # Optionally store residue type information
-    if residue_types is not None:
-        residue_types = tensor_to_numpy(residue_types)
-        residue_types = np.squeeze(residue_types)  # handle (1, N) from batched aatype
-        if len(residue_types) != num_residues:
+    if atom_mask is not None:
+        atom_mask = tensor_to_numpy(atom_mask)
+        atom_mask = np.squeeze(atom_mask)
+        if atom_mask.shape[0] != num_residues:
             raise ValueError(
-                f"residue_types length ({len(residue_types)}) must match "
+                f"atom_mask first dimension ({atom_mask.shape[0]}) must match "
                 f"number of residues ({num_residues})"
             )
-        tensor_to_zarr_array(
-            f"{archive_path}::structure/residue_types",
-            residue_types,
-            overwrite=True,
-        )
+        if atom_positions.ndim == 3 and atom_mask.ndim > 1:
+            num_atoms = atom_positions.shape[1]
+            if atom_mask.shape[1] != num_atoms:
+                raise ValueError(
+                    f"atom_mask second dimension ({atom_mask.shape[1]}) must match "
+                    f"num_atoms ({num_atoms}) when atom_positions is 3D"
+                )
+        if "atom_mask" in structure_group:
+            if not overwrite:
+                raise FileExistsError(
+                    "Dataset already exists at 'structure/atom_mask'. "
+                    "Set overwrite=True to replace it."
+                )
+            del structure_group["atom_mask"]
+        structure_group["atom_mask"] = zarr.array(atom_mask)
+
+    if ptm is not None:
+        ptm = tensor_to_numpy(ptm)
+        ptm = np.asarray(ptm)
+        if ptm.size != 1:
+            raise ValueError(
+                f"ptm must be a scalar value, got shape {ptm.shape}"
+            )
+        ptm = np.asarray(ptm.item())
+        if "ptm" in structure_group:
+            if not overwrite:
+                raise FileExistsError(
+                    "Dataset already exists at 'structure/ptm'. "
+                    "Set overwrite=True to replace it."
+                )
+            del structure_group["ptm"]
+        structure_group["ptm"] = zarr.array(ptm)
 
 
 # ============================================================
@@ -583,7 +653,7 @@ def validate_archive(path):
         activations
         attention maps
         pair representations
-        structure coordinates
+        structure atom positions
 
     - Metadata consistency if present.
 
@@ -632,26 +702,38 @@ def validate_archive(path):
  
     representations_group = root["representations"]
     if "pair" in representations_group:
-        pair = representations_group["pair"]
-        if pair.ndim != 3:
+        pair_group = representations_group["pair"]
+        if not isinstance(pair_group, zarr.Group):
             return False
-        if pair.shape[0] != pair.shape[1]:
-            return False
- 
+        for layer_key in pair_group:
+            pair = pair_group[layer_key]
+            if pair.ndim != 3:
+                return False
+            if pair.shape[0] != pair.shape[1]:
+                return False
+
     structure_group = root["structure"]
-    if "coordinates" not in structure_group:
+    if "atom_positions" not in structure_group:
+        return False
+
+    atom_positions = structure_group["atom_positions"]
+ 
+    if atom_positions.ndim not in (2, 3):
+        return False
+    if atom_positions.shape[-1] != 3:
         return False
  
-    coordinates = structure_group["coordinates"]
- 
-    if coordinates.ndim != 2:
-        return False
-    if coordinates.shape[-1] != 3:
-        return False
- 
-    if "residue_types" in structure_group:
-        residue_types = structure_group["residue_types"]
-        if len(residue_types) != coordinates.shape[0]:
+    if "atom_mask" in structure_group:
+        atom_mask = structure_group["atom_mask"]
+        if atom_mask.shape[0] != atom_positions.shape[0]:
+            return False
+        if atom_positions.ndim == 3 and atom_mask.ndim > 1:
+            if atom_mask.shape[1] != atom_positions.shape[1]:
+                return False
+
+    if "ptm" in structure_group:
+        ptm = structure_group["ptm"]
+        if np.prod(ptm.shape) != 1:
             return False
  
     if "metadata" in root:
@@ -794,9 +876,10 @@ def ingest_output_pkl(archive_path, pkl_file, overwrite=False):
     Load a VizFold/OpenFold output .pkl and route known arrays into the archive.
 
     Current routing behavior:
-    - final_atom_positions (N, 37, 3) -> structure/coordinates using CA atom (index 1)
-    - residue_types/aatype (if found) -> structure/residue_types
-    - pair representation (if found) -> representations/pair
+    - final_atom_positions (N, 37, 3) -> structure/atom_positions using CA atom (index 1)
+    - final_atom_mask (if found) -> structure/atom_mask using CA atom (index 1)
+    - ptm (if found) -> structure/ptm
+    - pair representation (if found) -> representations/pair/layer_00
     """
     with open(pkl_file, "rb") as f:
         output_dict = pickle.load(f)
@@ -811,17 +894,36 @@ def ingest_output_pkl(archive_path, pkl_file, overwrite=False):
     }
 
     final_positions = _extract_first_matching_array(output_dict, ["final", "atom", "positions"])
-    residue_types = _extract_first_matching_array(output_dict, ["aatype"])
-    if residue_types is None:
-        residue_types = _extract_first_matching_array(output_dict, ["residue", "type"])
+    final_atom_mask = _extract_first_matching_array(output_dict, ["final", "atom", "mask"])
+    ptm = _extract_first_matching_array(output_dict, ["ptm"])
 
     if final_positions is not None:
         if final_positions.ndim == 3 and final_positions.shape[-1] == 3:
-            coords = final_positions[:, 1, :] if final_positions.shape[1] > 1 else final_positions[:, 0, :]
-            store_structure_coordinates(archive_path, coords, residue_types=residue_types)
-            summary["stored"].append("structure/coordinates")
-            if residue_types is not None:
-                summary["stored"].append("structure/residue_types")
+            atom_positions = (
+                final_positions[:, 1, :]
+                if final_positions.shape[1] > 1
+                else final_positions[:, 0, :]
+            )
+            atom_mask = None
+            if final_atom_mask is not None:
+                final_atom_mask = tensor_to_numpy(final_atom_mask)
+                if final_atom_mask.ndim == 2:
+                    atom_mask = final_atom_mask[:, 1] if final_atom_mask.shape[1] > 1 else final_atom_mask[:, 0]
+                elif final_atom_mask.ndim == 1:
+                    atom_mask = final_atom_mask
+
+            store_structure_coordinates(
+                archive_path,
+                atom_positions,
+                atom_mask=atom_mask,
+                ptm=ptm,
+                overwrite=overwrite,
+            )
+            summary["stored"].append("structure/atom_positions")
+            if atom_mask is not None:
+                summary["stored"].append("structure/atom_mask")
+            if ptm is not None:
+                summary["stored"].append("structure/ptm")
         else:
             summary["skipped"].append("final_atom_positions (unexpected shape)")
     else:
@@ -830,11 +932,11 @@ def ingest_output_pkl(archive_path, pkl_file, overwrite=False):
     pair_array = _extract_first_matching_array(output_dict, ["pair"])
     if pair_array is not None and isinstance(pair_array, np.ndarray):
         if pair_array.ndim == 3 and pair_array.shape[0] == pair_array.shape[1]:
-            store_pair_representation(archive_path, pair_array)
-            summary["stored"].append("representations/pair")
+            store_pair_representation(archive_path, 0, pair_array, overwrite=overwrite)
+            summary["stored"].append("representations/pair/layer_00")
         else:
-            summary["skipped"].append("representations/pair (unexpected shape)")
+            summary["skipped"].append("representations/pair/layer_00 (unexpected shape)")
     else:
-        summary["skipped"].append("representations/pair (not found)")
+        summary["skipped"].append("representations/pair/layer_00 (not found)")
 
     return summary
