@@ -638,7 +638,7 @@ def load_attention_head(path, attention_type, layer_index, head_index):
 # METHOD 8
 # ============================================================
 
-def validate_archive(path, strict=True, return_details=False):
+def validate_archive(path, strict=True):
     """
     Validate the integrity of a VizFold trace archive.
 
@@ -671,101 +671,84 @@ def validate_archive(path, strict=True, return_details=False):
     strict : bool, optional
         Whether to enforce complete-archive requirements. Default is True.
 
-    return_details : bool, optional
-        If True, return a dictionary with validity, warnings, and errors.
-        If False, return only a boolean.
-
     Returns
     -------
-    bool | dict
-        Boolean validity, or a detailed validation result when
-        return_details=True.
+    dict
+        {'valid', 'strict_mode', 'path', 'errors', 'warnings', 'components_found'}
     """
-    result = {
+    report = {
         "valid": True,
-        "warnings": [],
+        "strict_mode": strict,
+        "path": path,
         "errors": [],
+        "warnings": [],
+        "components_found": {
+            "metadata": False,
+            "representations/single": False,
+            "representations/pair": False,
+            "attention": False,
+            "structure/atom_positions": False,
+        },
     }
 
     def _fail(message):
-        result["valid"] = False
-        result["errors"].append(message)
+        report["valid"] = False
+        report["errors"].append(message)
+        if strict:
+            raise ValueError(message)
 
     def _warn(message):
-        result["warnings"].append(message)
+        report["warnings"].append(message)
+
+    if not os.path.exists(path):
+        msg = f"Archive path does not exist: '{path}'"
+        report["valid"] = False
+        report["errors"].append(msg)
+        if strict:
+            raise FileNotFoundError(msg)
+        return report
 
     try:
-        root = zarr.open(path, mode='r')
-    except Exception:
-        return False
- 
-    required_groups = ("layers", "representations", "structure")
-    for group_name in required_groups:
-        if group_name not in root:
-            return False
- 
-    layers_group = root["layers"]
-    for layer_key in layers_group:
-        layer = layers_group[layer_key]
- 
-        if "activation" not in layer and "attention" not in layer:
-            return False
- 
-        if "activation" in layer:
-            activation = layer["activation"]
-            if activation.ndim != 2:
-                return False
- 
-        if "attention" in layer:
-            attention = layer["attention"]
-            if attention.ndim != 3:
-                return False
-            _, tokens_i, tokens_j = attention.shape
-            if tokens_i != tokens_j:
-                return False
- 
-    representations_group = root["representations"]
-    if "pair" in representations_group:
-        pair_group = representations_group["pair"]
-        if not isinstance(pair_group, zarr.Group):
-            return False
-        for layer_key in pair_group:
-            pair = pair_group[layer_key]
-            if pair.ndim != 3:
-                return False
-            if pair.shape[0] != pair.shape[1]:
-                return False
+        root = zarr.open(path, mode="r")
+    except Exception as e:
+        _fail(f"Failed to open archive as Zarr: {e}")
+        return report
 
-    structure_group = root["structure"]
-    if "atom_positions" not in structure_group:
-        return False
+    if "structure" not in root or "atom_positions" not in root.get("structure", {}):
+        _fail("Missing required dataset: 'structure/atom_positions'")
+    else:
+        atom_positions = root["structure"]["atom_positions"]
+        if atom_positions.ndim not in (2, 3) or atom_positions.shape[-1] != 3:
+            _fail(f"'structure/atom_positions' invalid shape: {atom_positions.shape}")
+        else:
+            report["components_found"]["structure/atom_positions"] = True
 
-    atom_positions = structure_group["atom_positions"]
- 
-    if atom_positions.ndim not in (2, 3):
-        return False
-    if atom_positions.shape[-1] != 3:
-        return False
- 
-    if "atom_mask" in structure_group:
-        atom_mask = structure_group["atom_mask"]
-        if atom_mask.shape[0] != atom_positions.shape[0]:
-            return False
-        if atom_positions.ndim == 3 and atom_mask.ndim > 1:
-            if atom_mask.shape[1] != atom_positions.shape[1]:
-                return False
+    if "metadata" not in root:
+        _fail("Missing group: 'metadata'") if strict else _warn("Missing group: 'metadata'")
+    else:
+        report["components_found"]["metadata"] = True
 
-    if "ptm" in structure_group:
-        ptm = structure_group["ptm"]
-        if np.prod(ptm.shape) != 1:
-            return False
- 
-    if "metadata" in root:
-        metadata = root["metadata"]
-        if not isinstance(metadata, (zarr.Array, zarr.Group)):
-            return False
- 
-    return True
+    reprs = root.get("representations", {})
+    if "single" not in reprs:
+        _fail("Missing group: 'representations/single'") if strict else _warn("Missing group: 'representations/single'")
+    elif not any(k.startswith("layer_") for k in reprs["single"].keys()):
+        _fail("'representations/single' has no layer_XX datasets") if strict else _warn("'representations/single' has no layer_XX datasets")
+    else:
+        report["components_found"]["representations/single"] = True
+
+    if "pair" not in reprs:
+        _fail("Missing group: 'representations/pair'") if strict else _warn("Missing group: 'representations/pair'")
+    elif not any(k.startswith("layer_") for k in reprs["pair"].keys()):
+        _fail("'representations/pair' has no layer_XX datasets") if strict else _warn("'representations/pair' has no layer_XX datasets")
+    else:
+        report["components_found"]["representations/pair"] = True
+
+    if "attention" not in root or not list(root["attention"].keys()):
+        _fail("Missing group: 'attention'") if strict else _warn("Missing group: 'attention'")
+    else:
+        report["components_found"]["attention"] = True
+
+    return report
 
 
 def ingest_attention_txt(archive_path, txt_file, layer_index, num_tokens, 
