@@ -1193,3 +1193,225 @@ def store_metadata(path, model_version, config_version, sequence,
             representation_names_array,
             overwrite=overwrite,
         )
+
+
+# ============================================================
+# METHOD 10
+# ============================================================
+
+def _load_dataset_as_python_value(dataset):
+    """Load a Zarr dataset and normalize 0-D values to Python scalars."""
+    value = np.asarray(dataset)
+    if value.shape == ():
+        return value.item()
+    return value
+
+
+def load_metadata(path):
+    """
+    Load metadata from a VizFold archive.
+
+    This is the read-side counterpart to store_metadata(). It returns the
+    metadata group contents as a plain dictionary so callers can inspect the
+    run context before loading heavier arrays.
+
+    Parameters
+    ----------
+    path : str
+        Root path to the Zarr archive.
+
+    Returns
+    -------
+    dict
+        Dictionary containing required and optional metadata fields.
+    """
+    root = zarr.open(path, mode="r")
+
+    if "metadata" not in root:
+        raise KeyError(f"No 'metadata' group found in archive at '{path}'.")
+
+    metadata_group = root["metadata"]
+    required_fields = (
+        "model_version",
+        "config_version",
+        "sequence",
+        "num_residues",
+        "num_recycles",
+    )
+    missing = [field for field in required_fields if field not in metadata_group]
+    if missing:
+        raise KeyError(
+            f"Missing required metadata field(s) in archive at '{path}': {missing}"
+        )
+
+    metadata = {}
+    for field in required_fields:
+        metadata[field] = _load_dataset_as_python_value(metadata_group[field])
+
+    for field in ("recycle_info", "residue_index", "representation_names"):
+        if field in metadata_group:
+            metadata[field] = _load_dataset_as_python_value(metadata_group[field])
+
+    return metadata
+
+
+# ============================================================
+# METHOD 11
+# ============================================================
+
+def load_single_representation(path, layer_index):
+    """
+    Load a per-layer single representation from the archive.
+
+    Parameters
+    ----------
+    path : str
+        Root path to the Zarr archive.
+
+    layer_index : int
+        Index of the transformer layer (0-indexed).
+
+    Returns
+    -------
+    numpy.ndarray
+        The stored single representation array.
+    """
+    _validate_layer_index(layer_index)
+    root = zarr.open(path, mode="r")
+
+    layer_name = f"layer_{layer_index:02d}"
+    dataset_path = f"representations/single/{layer_name}"
+
+    if "representations" not in root or "single" not in root["representations"]:
+        raise KeyError(
+            f"No 'representations/single' group found in archive at '{path}'."
+        )
+
+    single_group = root["representations/single"]
+    if layer_name not in single_group:
+        raise KeyError(
+            f"Layer '{layer_name}' not found at '{dataset_path}' in archive at '{path}'."
+        )
+
+    return np.asarray(single_group[layer_name])
+
+
+# ============================================================
+# METHOD 12
+# ============================================================
+
+def load_pair_representation(path, layer_index):
+    """
+    Load a per-layer pair representation from the archive.
+
+    Parameters
+    ----------
+    path : str
+        Root path to the Zarr archive.
+
+    layer_index : int
+        Index of the transformer layer (0-indexed).
+
+    Returns
+    -------
+    numpy.ndarray
+        The stored pair representation array.
+    """
+    _validate_layer_index(layer_index)
+    root = zarr.open(path, mode="r")
+
+    layer_name = f"layer_{layer_index:02d}"
+    dataset_path = f"representations/pair/{layer_name}"
+
+    if "representations" not in root or "pair" not in root["representations"]:
+        raise KeyError(
+            f"No 'representations/pair' group found in archive at '{path}'."
+        )
+
+    pair_group = root["representations/pair"]
+    if layer_name not in pair_group:
+        raise KeyError(
+            f"Layer '{layer_name}' not found at '{dataset_path}' in archive at '{path}'."
+        )
+
+    return np.asarray(pair_group[layer_name])
+
+
+# ============================================================
+# METHOD 13
+# ============================================================
+
+class ArchiveOrchestrator:
+    """
+    Thin helper that sequences archive writes and records what happened.
+
+    The class intentionally stays lightweight: it does not replace the core
+    store_* functions, it only coordinates them and captures a run log.
+    """
+
+    def __init__(self, archive_path):
+        self.archive_path = archive_path.rstrip("/")
+        self.events = []
+
+    def _record(self, action, target, **details):
+        event = {"action": action, "target": target}
+        if details:
+            event.update(details)
+        self.events.append(event)
+        return event
+
+    def add_metadata(self, *args, **kwargs):
+        store_metadata(self.archive_path, *args, **kwargs)
+        return self._record("store", "metadata")
+
+    def add_single_layer(self, layer_index, single_array, overwrite=False):
+        store_single_representation(
+            self.archive_path,
+            layer_index,
+            single_array,
+            overwrite=overwrite,
+        )
+        return self._record("store", f"representations/single/layer_{layer_index:02d}")
+
+    def add_pair_layer(self, layer_index, pair_array, overwrite=False):
+        store_pair_representation(
+            self.archive_path,
+            layer_index,
+            pair_array,
+            overwrite=overwrite,
+        )
+        return self._record("store", f"representations/pair/layer_{layer_index:02d}")
+
+    def add_attention(self, attention_type, layer_index, attention_array, overwrite=False):
+        store_attention(
+            self.archive_path,
+            attention_type,
+            layer_index,
+            attention_array,
+            overwrite=overwrite,
+        )
+        return self._record(
+            "store",
+            f"attention/{attention_type}/layer_{layer_index:02d}",
+        )
+
+    def add_structure(self, atom_positions, atom_mask=None, ptm=None, overwrite=False):
+        store_structure_coordinates(
+            self.archive_path,
+            atom_positions,
+            atom_mask=atom_mask,
+            ptm=ptm,
+            overwrite=overwrite,
+        )
+        return self._record("store", "structure")
+
+    def validate(self, validator=validate_archive, *args, **kwargs):
+        result = validator(self.archive_path, *args, **kwargs)
+        self._record("validate", "archive", result=result)
+        return result
+
+    def summary(self):
+        return {
+            "archive_path": self.archive_path,
+            "events": list(self.events),
+        }
