@@ -10,14 +10,24 @@ import re
 import numpy as np
 import zarr
 
-from core import _validate_layer_index, tensor_to_numpy, validate_archive
-from store import (
-    store_attention,
-    store_metadata,
-    store_pair_representation,
-    store_single_representation,
-    store_structure_coordinates,
-)
+try:
+    from .core import tensor_to_numpy, validate_archive
+    from .store import (
+        store_attention,
+        store_metadata,
+        store_pair_representation,
+        store_single_representation,
+        store_structure_coordinates,
+    )
+except ImportError:  # Allow direct script-style imports from the archive directory.
+    from core import tensor_to_numpy, validate_archive
+    from store import (
+        store_attention,
+        store_metadata,
+        store_pair_representation,
+        store_single_representation,
+        store_structure_coordinates,
+    )
 
 
 # ============================================================
@@ -472,7 +482,10 @@ def load_metadata(path):
 
 def load_single_representation(path, layer_index):
     """
-    Load a per-layer single representation from the archive.
+    Load the per-residue (single) representation for one Evoformer layer.
+
+    Archive location read:
+        representations/single/layer_{layer_index:02d}
 
     Parameters
     ----------
@@ -480,28 +493,46 @@ def load_single_representation(path, layer_index):
         Root path to the Zarr archive.
 
     layer_index : int
-        Index of the transformer layer (0-indexed).
+        Zero-based Evoformer layer index to retrieve.
 
     Returns
     -------
     numpy.ndarray
-        The stored single representation array.
+        Per-residue representation, shape (num_residues, single_dim).
+
+    Raises
+    ------
+    KeyError
+        If the requested layer does not exist in the archive.
+
+    Examples
+    --------
+    >>> single = load_single_representation("trace.zarr", 0)
+    >>> single.shape
+    (128, 256)
     """
-    _validate_layer_index(layer_index)
-    root = zarr.open(path, mode="r")
+    root = zarr.open(path, mode='r')
 
-    layer_name = f"layer_{layer_index:02d}"
-    dataset_path = f"representations/single/{layer_name}"
+    if "representations" not in root:
+        raise KeyError(
+            f"No 'representations' group found in archive at '{path}'."
+        )
 
-    if "representations" not in root or "single" not in root["representations"]:
+    repr_group = root["representations"]
+
+    if "single" not in repr_group:
         raise KeyError(
             f"No 'representations/single' group found in archive at '{path}'."
         )
 
-    single_group = root["representations/single"]
+    single_group = repr_group["single"]
+    layer_name = f"layer_{layer_index:02d}"
+
     if layer_name not in single_group:
         raise KeyError(
-            f"Layer '{layer_name}' not found at '{dataset_path}' in archive at '{path}'."
+            f"Layer {layer_index} ('{layer_name}') not found in "
+            f"representations/single at '{path}'. "
+            f"Available layers: {list(single_group.keys())}"
         )
 
     return np.asarray(single_group[layer_name])
@@ -513,7 +544,10 @@ def load_single_representation(path, layer_index):
 
 def load_pair_representation(path, layer_index):
     """
-    Load a per-layer pair representation from the archive.
+    Load the pairwise representation for one Evoformer layer.
+
+    Archive location read:
+        representations/pair/layer_{layer_index:02d}
 
     Parameters
     ----------
@@ -521,28 +555,46 @@ def load_pair_representation(path, layer_index):
         Root path to the Zarr archive.
 
     layer_index : int
-        Index of the transformer layer (0-indexed).
+        Zero-based Evoformer layer index to retrieve.
 
     Returns
     -------
     numpy.ndarray
-        The stored pair representation array.
+        Pairwise representation, shape (num_residues, num_residues, pair_dim).
+
+    Raises
+    ------
+    KeyError
+        If the requested layer does not exist in the archive.
+
+    Examples
+    --------
+    >>> pair = load_pair_representation("trace.zarr", 0)
+    >>> pair.shape
+    (128, 128, 128)
     """
-    _validate_layer_index(layer_index)
-    root = zarr.open(path, mode="r")
+    root = zarr.open(path, mode='r')
 
-    layer_name = f"layer_{layer_index:02d}"
-    dataset_path = f"representations/pair/{layer_name}"
+    if "representations" not in root:
+        raise KeyError(
+            f"No 'representations' group found in archive at '{path}'."
+        )
 
-    if "representations" not in root or "pair" not in root["representations"]:
+    repr_group = root["representations"]
+
+    if "pair" not in repr_group:
         raise KeyError(
             f"No 'representations/pair' group found in archive at '{path}'."
         )
 
-    pair_group = root["representations/pair"]
+    pair_group = repr_group["pair"]
+    layer_name = f"layer_{layer_index:02d}"
+
     if layer_name not in pair_group:
         raise KeyError(
-            f"Layer '{layer_name}' not found at '{dataset_path}' in archive at '{path}'."
+            f"Layer {layer_index} ('{layer_name}') not found in "
+            f"representations/pair at '{path}'. "
+            f"Available layers: {list(pair_group.keys())}"
         )
 
     return np.asarray(pair_group[layer_name])

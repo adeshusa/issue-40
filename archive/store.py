@@ -7,7 +7,10 @@ Methods related to writing archive content.
 import numpy as np
 import zarr
 
-from core import _validate_layer_index, tensor_to_numpy, tensor_to_zarr_array
+try:
+    from .core import _validate_layer_index, tensor_to_numpy, tensor_to_zarr_array
+except ImportError:  # Allow direct script-style imports from the archive directory.
+    from core import _validate_layer_index, tensor_to_numpy, tensor_to_zarr_array
 
 
 # ============================================================
@@ -299,6 +302,7 @@ def store_structure_coordinates(path, atom_positions, atom_mask=None, ptm=None, 
     num_residues = atom_positions.shape[0]
     root = zarr.open(path.rstrip("/"), mode="a")
     structure_group = root.require_group("structure")
+    atom_positions = np.asarray(atom_positions)
 
     if "atom_positions" in structure_group:
         if not overwrite:
@@ -307,11 +311,16 @@ def store_structure_coordinates(path, atom_positions, atom_mask=None, ptm=None, 
                 "Set overwrite=True to replace it."
             )
         del structure_group["atom_positions"]
-    structure_group["atom_positions"] = zarr.array(atom_positions)
+    structure_group.create_dataset(
+        "atom_positions",
+        data=atom_positions,
+        shape=atom_positions.shape,
+        dtype=atom_positions.dtype,
+    )
 
     if atom_mask is not None:
         atom_mask = tensor_to_numpy(atom_mask)
-        atom_mask = np.squeeze(atom_mask)
+        atom_mask = np.asarray(np.squeeze(atom_mask))
         if atom_mask.shape[0] != num_residues:
             raise ValueError(
                 f"atom_mask first dimension ({atom_mask.shape[0]}) must match "
@@ -331,7 +340,12 @@ def store_structure_coordinates(path, atom_positions, atom_mask=None, ptm=None, 
                     "Set overwrite=True to replace it."
                 )
             del structure_group["atom_mask"]
-        structure_group["atom_mask"] = zarr.array(atom_mask)
+        structure_group.create_dataset(
+            "atom_mask",
+            data=atom_mask,
+            shape=atom_mask.shape,
+            dtype=atom_mask.dtype,
+        )
 
     if ptm is not None:
         ptm = tensor_to_numpy(ptm)
@@ -340,7 +354,7 @@ def store_structure_coordinates(path, atom_positions, atom_mask=None, ptm=None, 
             raise ValueError(
                 f"ptm must be a scalar value, got shape {ptm.shape}"
             )
-        ptm = np.asarray(ptm.item())
+        ptm_value = np.array([float(ptm.item())], dtype=np.float32)
         if "ptm" in structure_group:
             if not overwrite:
                 raise FileExistsError(
@@ -348,7 +362,12 @@ def store_structure_coordinates(path, atom_positions, atom_mask=None, ptm=None, 
                     "Set overwrite=True to replace it."
                 )
             del structure_group["ptm"]
-        structure_group["ptm"] = zarr.array(ptm)
+        structure_group.create_dataset(
+            "ptm",
+            data=ptm_value,
+            shape=ptm_value.shape,
+            dtype=ptm_value.dtype,
+        )
 
 
 # ============================================================

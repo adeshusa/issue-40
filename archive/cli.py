@@ -11,9 +11,14 @@ Examples:
 import argparse
 import json
 
-from core import validate_archive
-from load import ingest_attention_txt, ingest_output_pkl
-from store import store_metadata
+try:
+    from .core import validate_archive
+    from .load import ingest_attention_txt, ingest_output_pkl
+    from .store import store_metadata
+except ImportError:  # Allow running as `python archive/cli.py`.
+    from core import validate_archive
+    from load import ingest_attention_txt, ingest_output_pkl
+    from store import store_metadata
 
 
 def _cmd_validate(args):

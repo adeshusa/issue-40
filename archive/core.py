@@ -97,6 +97,7 @@ def tensor_to_zarr_array(path, tensor, chunks=None, overwrite=False):
     """
     import os
     array = tensor_to_numpy(tensor)
+    array = np.asarray(array)
 
     if "::" in path:
         archive_path, dataset_path = path.split("::", 1)
@@ -120,7 +121,14 @@ def tensor_to_zarr_array(path, tensor, chunks=None, overwrite=False):
         if dataset_name in parent_group:
             del parent_group[dataset_name]
 
-        parent_group[dataset_name] = zarr.array(array, chunks=chunks)
+        create_kwargs = {
+            "data": array,
+            "shape": array.shape,
+            "dtype": array.dtype,
+        }
+        if chunks is not None:
+            create_kwargs["chunks"] = chunks
+        parent_group.create_dataset(dataset_name, **create_kwargs)
         return parent_group[dataset_name]
 
     if os.path.exists(path) and not overwrite:
